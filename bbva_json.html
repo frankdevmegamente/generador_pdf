@@ -393,8 +393,8 @@
         <div class="form-section">
             <h3>Operación y Folios</h3>
             <div class="form-row">
-                <div class="form-group"><label>Cuenta Retiro</label><input type="text" id="inCtaR"
-                        value="6212260202000000048" oninput="up()"></div>
+                <div class="form-group"><label>Cuenta Retiro</label><input type="text" id="inCtaR" value=""
+                        oninput="up()"></div>
                 <div class="form-group"><label>Importe a Cargar</label><input type="text" id="inImpC" value="18,336.20"
                         oninput="up()"></div>
             </div>
@@ -550,16 +550,10 @@
         // BASE DE DATOS DE TITULARES (JSON)
         const baseDatosTitulares = {
             "COMERCIALIZADORA BELOCIO SA DE CV": {
-                swiftbic: "CIBKCNBJ230",
-                pais: "CHINA",
-                bancoDestino: "CHINA CITIC BANK HEFEI BRANCH",
-                direccionBanco: "396 HUIZHOU ROAD"
+                cuentaRetiro: "6212260202000000048",
             },
             "MI EMPRESA DE PRUEBA SA DE CV": {
-                swiftbic: "PRUEBA",
-                pais: "PRUEBA",
-                bancoDestino: "PRUEBA",
-                direccionBanco: "PRUEBA"
+                cuentaRetiro: "6212260202000000048",
             }
         };
 
@@ -569,15 +563,9 @@
             const datos = baseDatosTitulares[titularSeleccionado];
 
             if (datos) {
-                document.getElementById('inSwi').value = datos.swiftbic;
-                document.getElementById('inPaiB').value = datos.pais;
-                document.getElementById('inBanD').value = datos.bancoDestino;
-                document.getElementById('inDirB').value = datos.direccionBanco;
+                document.getElementById('inCtaR').value = datos.cuentaRetiro;
             } else {
-                document.getElementById('inSwi').value = "";
-                document.getElementById('inPaiB').value = "";
-                document.getElementById('inBanD').value = "";
-                document.getElementById('inDirB').value = "";
+                document.getElementById('inCtaR').value = "";
             }
         }
 

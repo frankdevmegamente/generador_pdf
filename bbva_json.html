@@ -70,7 +70,6 @@
             color: #adb5bd;
         }
 
-        /* Se agregó 'select' para que la lista desplegable tenga el mismo estilo */
         input,
         select {
             width: 100%;
@@ -324,6 +323,9 @@
         <button onclick="limpiar()"
             style="width:100%; margin-top:5px; padding:5px; background:#444; color:white; border:none; cursor:pointer; font-size:10px;">LIMPIAR
             DATOS</button>
+        <button onclick="generarDatosRandom(); up();"
+            style="width:100%; margin-top:5px; padding:5px; background:#ff9900; color:white; border:none; cursor:pointer; font-size:10px; font-weight:bold;">GENERAR
+            FOLIOS RANDOM</button>
 
         <div class="form-section">
             <h3>Encabezado y Cliente</h3>
@@ -343,21 +345,6 @@
             <div class="form-group" style="display: none"><label>Fecha y Hora (Ej: 16/02/2026 13:52:05 PM)</label><input
                     type="text" id="inFec" value="" readonly oninput="up()"></div>
         </div>
-
-        <div class="form-section">
-            <h3>Banco Destino</h3>
-            <div class="form-row">
-                <div class="form-group"><label>SWIFT/BIC</label><input type="text" id="inSwi" value="" oninput="up()">
-                </div>
-                <div class="form-group"><label>País</label><input type="text" id="inPaiB" value="" oninput="up()">
-                </div>
-            </div>
-            <div class="form-group"><label>Banco Destino</label><input type="text" id="inBanD" value="" oninput="up()">
-            </div>
-            <div class="form-group"><label>Dirección Banco</label><input type="text" id="inDirB" value=""
-                    oninput="up()"></div>
-        </div>
-
         <div class="form-section">
             <div class="form-group">
                 <label>Beneficiario</label>
@@ -386,28 +373,50 @@
                 <div class="form-group"><label>Num Exterior</label><input type="text" id="inNumE" value=""
                         oninput="up()"></div>
             </div>
-            <div class="form-group"><label>Código Postal</label><input type="text" id="inCP" value="" oninput="up()">
+            <div class="form-row">
+                <div class="form-group"><label>Código Postal</label><input type="text" id="inCP" value=""
+                        oninput="up()"></div>
+                <div class="form-group">
+                    <label>Banco</label>
+                    <select id="inBan" onchange="autocompletarBancoDestino(); up();">
+                        <option value="">-- Selecciona un Beneficiario primero --</option>
+                    </select>
+                </div>
             </div>
         </div>
+
+        <div class="form-section">
+            <h3>Banco Destino</h3>
+            <div class="form-row">
+                <div class="form-group"><label>SWIFT/BIC</label><input type="text" id="inSwi" value="" oninput="up()">
+                </div>
+                <div class="form-group"><label>País</label><input type="text" id="inPaiB" value="" oninput="up()">
+                </div>
+            </div>
+            <div class="form-group"><label>Banco Destino</label><input type="text" id="inBanD" value="" oninput="up()">
+            </div>
+            <div class="form-group"><label>Dirección Banco</label><input type="text" id="inDirB" value=""
+                    oninput="up()"></div>
+        </div>
+
 
         <div class="form-section">
             <h3>Operación y Folios</h3>
             <div class="form-row">
                 <div class="form-group"><label>Cuenta Retiro</label><input type="text" id="inCtaR" value=""
                         oninput="up()"></div>
-                <div class="form-group"><label>Importe a Cargar</label><input type="text" id="inImpC" value="18,336.20"
-                        oninput="up()"></div>
+                <div class="form-group"><label>Importe a Cargar</label><input type="text" id="inImpC"
+                        placeholder="$10,000.00" value="" oninput="up()"></div>
             </div>
-            <div class="form-group"><label>Monto Divisa Enviar</label><input type="text" id="inMonE" value="18,336.20"
-                    oninput="up()"></div>
+            <div class="form-group"><label>Monto Divisa Enviar</label><input type="text" id="inMonE"
+                    placeholder="$10,000.00" value="" oninput="up()"></div>
             <div class="form-row">
-                <div class="form-group"><label>Folio Operación</label><input type="text" id="inFolO" value="4581332268"
+                <div class="form-group"><label>Folio Operación</label><input type="text" id="inFolO" value=""
                         oninput="up()"></div>
-                <div class="form-group"><label>Folio Cambiario</label><input type="text" id="inFolC" value="14059784"
+                <div class="form-group"><label>Folio Cambiario</label><input type="text" id="inFolC" value=""
                         oninput="up()"></div>
             </div>
-            <div class="form-group"><label>UETR</label><input type="text" id="inUet"
-                    value="559460256-5655-3025-e23b-22561b153e66a" oninput="up()"></div>
+            <div class="form-group"><label>UETR</label><input type="text" id="inUet" value="" oninput="up()"></div>
         </div>
     </div>
 
@@ -547,7 +556,6 @@
     </div>
 
     <script>
-        // BASE DE DATOS DE TITULARES (JSON)
         const baseDatosTitulares = {
             "COMERCIALIZADORA BELOCIO SA DE CV": {
                 cuentaRetiro: "6212260202000000048",
@@ -576,8 +584,22 @@
                 estado: "ANHUI",
                 ciudad: "HEFEI CITY",
                 codigoPostal: "230000",
-                calle: "NO. 1688, SHENGXIN ROAD, ECONOMIC AND TECHNOLOGICAL DEVELOPMENT ZONE",
-                numExterior: ""
+                calle: "NO. 1688, SHENGXIN ROAD",
+                numExterior: "311 23 ROOM, FLOOR 3, BUILDING 7",
+                bancos: [
+                    {
+                        nombre: "BANK OF CHINA",
+                        swift: "BKCHCNBJ",
+                        pais: "CHINA",
+                        direccion: "1 FUXINGMEN NEI DAJIE, BEIJING 100818"
+                    },
+                    {
+                        nombre: "INDUSTRIAL AND COMMERCIAL BANK OF CHINA",
+                        swift: "ICBCCNBJ",
+                        pais: "CHINA",
+                        direccion: "NO 55 FUXINGMENNEI STREET, XICHENG DISTRICT"
+                    }
+                ]
             },
             "MI EMPRESA DE PRUEBA SA DE CV": {
                 cuentaDeposito: "PRUEBA0987654321",
@@ -586,13 +608,25 @@
                 ciudad: "PRUEBA",
                 codigoPostal: "PRUEBA",
                 calle: "PRUEBA",
-                numExterior: "PRUEBA"
+                numExterior: "PRUEBA",
+                bancos: [
+                    {
+                        nombre: "SANTANDER MEXICO",
+                        swift: "BSMXMXMM",
+                        pais: "MEXICO",
+                        direccion: "PROLONGACION PASEO DE LA REFORMA 500"
+                    }
+                ]
             }
         };
 
         function autocompletarBeneficiario() {
             const beneficiarioSeleccionado = document.getElementById('inBen').value;
             const datos = baseDatosBeneficiarios[beneficiarioSeleccionado];
+            const selectBanco = document.getElementById('inBan');
+
+            // Limpiamos las opciones del select de bancos
+            selectBanco.innerHTML = '';
 
             if (datos) {
                 document.getElementById('inCtaD').value = datos.cuentaDeposito;
@@ -602,7 +636,24 @@
                 document.getElementById('inCal').value = datos.calle;
                 document.getElementById('inNumE').value = datos.numExterior;
                 document.getElementById('inCP').value = datos.codigoPostal;
+
+                // Llenamos el select con los bancos disponibles
+                if (datos.bancos && datos.bancos.length > 0) {
+                    datos.bancos.forEach((banco, index) => {
+                        const option = document.createElement('option');
+                        // Usamos el 'index' (0, 1, 2) como valor para identificarlo fácilmente luego
+                        option.value = index;
+                        option.text = banco.nombre;
+                        selectBanco.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = "";
+                    option.text = "-- Sin banco registrado --";
+                    selectBanco.appendChild(option);
+                }
             } else {
+                // Limpiar los campos si no hay beneficiario seleccionado
                 document.getElementById('inCtaD').value = "";
                 document.getElementById('inPaiBen').value = "";
                 document.getElementById('inEst').value = "";
@@ -610,7 +661,59 @@
                 document.getElementById('inCal').value = "";
                 document.getElementById('inNumE').value = "";
                 document.getElementById('inCP').value = "";
+
+                const option = document.createElement('option');
+                option.value = "";
+                option.text = "-- Selecciona un Beneficiario primero --";
+                selectBanco.appendChild(option);
             }
+
+            // MUY IMPORTANTE: Forzamos a que se llenen los datos del primer banco automáticamente
+            autocompletarBancoDestino();
+        }
+
+        // NUEVA FUNCIÓN QUE LLENA LA SECCIÓN "BANCO DESTINO"
+        function autocompletarBancoDestino() {
+            const beneficiarioSeleccionado = document.getElementById('inBen').value;
+            const indiceBanco = document.getElementById('inBan').value; // Nos da el 0, 1, 2...
+
+            // Si hay un beneficiario y se seleccionó un banco válido
+            if (beneficiarioSeleccionado && indiceBanco !== "") {
+                const bancoDatos = baseDatosBeneficiarios[beneficiarioSeleccionado].bancos[indiceBanco];
+
+                if (bancoDatos) {
+                    document.getElementById('inBanD').value = bancoDatos.nombre;
+                    document.getElementById('inSwi').value = bancoDatos.swift;
+                    document.getElementById('inPaiB').value = bancoDatos.pais;
+                    document.getElementById('inDirB').value = bancoDatos.direccion;
+                    return; // Terminamos aquí si todo salió bien
+                }
+            }
+
+            // Si no hay banco o beneficiario, vaciamos la sección de Banco Destino
+            document.getElementById('inBanD').value = "";
+            document.getElementById('inSwi').value = "";
+            document.getElementById('inPaiB').value = "";
+            document.getElementById('inDirB').value = "";
+        }
+
+        // --- NUEVA FUNCIÓN PARA GENERAR FOLIOS ALEATORIOS ---
+        function generarDatosRandom() {
+            // Folio de Operación: 10 dígitos aleatorios
+            const folioO = Math.floor(1000000000 + Math.random() * 9000000000);
+            document.getElementById('inFolO').value = folioO;
+
+            // Folio Cambiario: 8 dígitos aleatorios
+            const folioC = Math.floor(10000000 + Math.random() * 90000000);
+            document.getElementById('inFolC').value = folioC;
+
+            // UETR: Formato estandar UUID versión 4 usado en transferencias internacionales SWIFT GPI
+            const uetr = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+            document.getElementById('inUet').value = uetr;
         }
 
         function up() {
@@ -678,6 +781,7 @@
         autocompletarFechas();
         autocompletarTitular();
         autocompletarBeneficiario(); // Llenamos la cuenta del titular seleccionado por defecto
+        generarDatosRandom();        // Llenamos los folios y el UETR de forma aleatoria
         up(); // Refrescamos la vista para que todo se pinte en el comprobante
     </script>
 

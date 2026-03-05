@@ -313,6 +313,10 @@
 <body>
 
     <div id="sidebar">
+        <button onclick="agregarNuevoTitular()"
+            style="width:100%; margin-top:5px; padding:5px; background:#28a745; color:white; border:none; cursor:pointer; font-size:10px; font-weight:bold;">
+            + NUEVO TITULAR
+        </button>
         <div style="display:flex; justify-content:space-between; align-items:center">
             <h3>BBVA EDITOR</h3>
             <a href="index.html" style="color:#00aaff; text-decoration:none; font-size:11px">← VOLVER</a>
@@ -556,14 +560,73 @@
     </div>
 
     <script>
-        const baseDatosTitulares = {
-            "COMERCIALIZADORA BELOCIO SA DE CV": {
-                cuentaRetiro: "6212260202000000048",
-            },
-            "MI EMPRESA DE PRUEBA SA DE CV": {
-                cuentaRetiro: "6212260202000000048",
+        //URL DE GOOGLE 
+        const API_URL = "https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbweC71I4K9vCjVOb5dBy7fwS9VL1vsgyAUt3Y6Fre1DQIU5UBgVDfv_6-kQ4vkcO2f_/exec/exec";
+        // Empezamos con la base de datos vacía, se llenará desde Google Sheets
+        let baseDatosTitulares = {};
+        // 1. DIBUJAR EL MENÚ DESPLEGABLE
+        function cargarSelectTitulares() {
+            const selectTitular = document.getElementById('inTit');
+            selectTitular.innerHTML = '<option value="" selected>-- Selecciona un Titular --</option>';
+
+            for (const nombreTitular in baseDatosTitulares) {
+                const option = document.createElement('option');
+                option.value = nombreTitular;
+                option.text = nombreTitular;
+                selectTitular.appendChild(option);
             }
-        };
+        }
+
+        // 2. LEER DATOS DESDE GOOGLE SHEETS
+        async function cargarDatosDesdeSheets() {
+            const selectTitular = document.getElementById('inTit');
+            selectTitular.innerHTML = '<option value="">Cargando titulares desde la nube...</option>';
+
+            try {
+                const respuesta = await fetch(API_URL);
+                const datos = await respuesta.json();
+
+                baseDatosTitulares = datos; // Reemplazamos los datos locales con los de la nube
+                cargarSelectTitulares();    // Volvemos a dibujar el menú
+
+            } catch (error) {
+                console.error("Error leyendo Google Sheets:", error);
+                selectTitular.innerHTML = '<option value="">Error al cargar titulares</option>';
+            }
+        }
+
+        // 3. GUARDAR UN NUEVO TITULAR EN GOOGLE SHEETS
+        async function agregarNuevoTitular() {
+            const nuevoNombre = prompt("Ingresa el nombre del NUEVO Titular:");
+            if (!nuevoNombre) return;
+
+            const nuevaCuenta = prompt("Ingresa la cuenta de retiro para " + nuevoNombre + ":");
+            if (!nuevaCuenta) return;
+
+            // Lo agregamos visualmente de inmediato para que no tengas que esperar
+            baseDatosTitulares[nuevoNombre.toUpperCase()] = { cuentaRetiro: nuevaCuenta };
+            cargarSelectTitulares();
+
+            // Lo enviamos a Google Sheets de fondo
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Esto es vital para que Netlify y Google no peleen por seguridad
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nombre: nuevoNombre.toUpperCase(),
+                        cuentaRetiro: nuevaCuenta
+                    })
+                });
+
+                alert("¡" + nuevoNombre.toUpperCase() + " guardado exitosamente en tu base de datos!");
+            } catch (error) {
+                console.error("Error guardando:", error);
+                alert("Hubo un error al intentar guardar en la nube.");
+            }
+        }
 
         // FUNCIÓN PARA AUTOCOMPLETAR LA CUENTA
         function autocompletarTitular() {
@@ -777,6 +840,7 @@
         }
 
         // --- INICIALIZACIÓN AL ABRIR LA PÁGINA ---
+        cargarDatosDesdeSheets();
         autocompletarFechas_hora();
         autocompletarFechas();
         autocompletarTitular();

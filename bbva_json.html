@@ -307,16 +307,90 @@
         .banregio-btn:hover {
             background-color: #f5f5f5;
         }
+
+        /* Estilos para el Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            display: none;
+            /* Oculto por defecto */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 320px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            font-family: 'Helvetica', Arial, sans-serif;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #072146;
+            font-size: 16px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .modal-content label {
+            font-size: 11px;
+            color: #666;
+            margin-top: 12px;
+        }
+
+        .modal-content input {
+            font-size: 13px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .btn-cancelar {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-guardar {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-guardar:disabled {
+            background: #88cfa0;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
 <body>
 
     <div id="sidebar">
-        <button onclick="agregarNuevoTitular()"
-            style="width:100%; margin-top:5px; padding:5px; background:#28a745; color:white; border:none; cursor:pointer; font-size:10px; font-weight:bold;">
-            + NUEVO TITULAR
-        </button>
+        <button onclick="abrirModalTitular()"
+            style="width:100%; margin-top:5px; padding:5px; background:#28a745; color:white; border:none; cursor:pointer; font-size:10px; font-weight:bold;">+
+            NUEVO TITULAR</button>
         <div style="display:flex; justify-content:space-between; align-items:center">
             <h3>BBVA EDITOR</h3>
             <a href="index.html" style="color:#00aaff; text-decoration:none; font-size:11px">← VOLVER</a>
@@ -595,36 +669,57 @@
             }
         }
 
-        // 3. GUARDAR UN NUEVO TITULAR EN GOOGLE SHEETS
-        async function agregarNuevoTitular() {
-            const nuevoNombre = prompt("Ingresa el nombre del NUEVO Titular:");
-            if (!nuevoNombre) return;
+        // --- FUNCIONES DEL MODAL ---
+        function abrirModalTitular() {
+            document.getElementById('modalTitular').style.display = 'flex';
+            document.getElementById('modNomTit').value = '';
+            document.getElementById('modCtaTit').value = '';
+        }
 
-            const nuevaCuenta = prompt("Ingresa la cuenta de retiro para " + nuevoNombre + ":");
-            if (!nuevaCuenta) return;
+        function cerrarModalTitular() {
+            document.getElementById('modalTitular').style.display = 'none';
+        }
+
+        async function guardarDesdeModal() {
+            const nuevoNombre = document.getElementById('modNomTit').value.trim();
+            const nuevaCuenta = document.getElementById('modCtaTit').value.trim();
+
+            if (!nuevoNombre || !nuevaCuenta) {
+                alert("Por favor llena ambos campos.");
+                return;
+            }
+
+            const btnGuardar = document.getElementById('btnGuardarModal');
+
+            // Cambiamos el texto del botón mientras carga
+            btnGuardar.innerText = "Guardando...";
+            btnGuardar.disabled = true;
 
             // Actualización visual inmediata
             baseDatosTitulares[nuevoNombre.toUpperCase()] = { cuentaRetiro: nuevaCuenta };
             cargarSelectTitulares();
 
-            // Enviar a Google Sheets
             try {
                 await fetch(API_URL, {
                     method: 'POST',
-                    // Este es el formato clave para saltar el bloqueo CORS
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8'
-                    },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({
                         nombre: nuevoNombre.toUpperCase(),
                         cuentaRetiro: nuevaCuenta
                     })
                 });
 
-                alert("¡" + nuevoNombre.toUpperCase() + " guardado correctamente!");
+                // Si termina bien, cerramos el modal
+                cerrarModalTitular();
+                alert("¡Titular guardado en la nube!");
+
             } catch (error) {
                 console.error("Error al guardar:", error);
-                alert("Hubo un problema de red.");
+                alert("Se guardó temporalmente, pero hubo un error de red al subirlo a la nube.");
+            } finally {
+                // Restauramos el botón a su estado original
+                btnGuardar.innerText = "Guardar Titular";
+                btnGuardar.disabled = false;
             }
         }
 
@@ -849,6 +944,23 @@
         up(); // Refrescamos la vista para que todo se pinte en el comprobante
     </script>
 
+
+    <div id="modalTitular" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Agregar Nuevo Titular</h3>
+
+            <label>Nombre del Titular:</label>
+            <input type="text" id="modNomTit" placeholder="Ej. EMPRESA SA DE CV">
+
+            <label>Cuenta de Retiro (18 dígitos):</label>
+            <input type="text" id="modCtaTit" placeholder="Ej. 123456789012345678">
+
+            <div class="modal-buttons">
+                <button class="btn-cancelar" onclick="cerrarModalTitular()">Cancelar</button>
+                <button class="btn-guardar" id="btnGuardarModal" onclick="guardarDesdeModal()">Guardar Titular</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

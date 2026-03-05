@@ -561,7 +561,7 @@
 
     <script>
         //URL DE GOOGLE 
-        const API_URL = "https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbweC71I4K9vCjVOb5dBy7fwS9VL1vsgyAUt3Y6Fre1DQIU5UBgVDfv_6-kQ4vkcO2f_/exec/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbweC71I4K9vCjVOb5dBy7fwS9VL1vsgyAUt3Y6Fre1DQIU5UBgVDfv_6-kQ4vkcO2f_/exec";
         // Empezamos con la base de datos vacía, se llenará desde Google Sheets
         let baseDatosTitulares = {};
         // 1. DIBUJAR EL MENÚ DESPLEGABLE
@@ -595,7 +595,7 @@
             }
         }
 
-        // 3. GUARDAR UN NUEVO TITULAR EN GOOGLE SHEETS (VERSIÓN DEFINITIVA)
+        // 3. GUARDAR UN NUEVO TITULAR EN GOOGLE SHEETS
         async function agregarNuevoTitular() {
             const nuevoNombre = prompt("Ingresa el nombre del NUEVO Titular:");
             if (!nuevoNombre) return;
@@ -603,17 +603,17 @@
             const nuevaCuenta = prompt("Ingresa la cuenta de retiro para " + nuevoNombre + ":");
             if (!nuevaCuenta) return;
 
-            // Lo agregamos visualmente de inmediato en tu pantalla
+            // Actualización visual inmediata
             baseDatosTitulares[nuevoNombre.toUpperCase()] = { cuentaRetiro: nuevaCuenta };
             cargarSelectTitulares();
 
-            // Lo enviamos a Google Sheets de fondo
+            // Enviar a Google Sheets
             try {
                 await fetch(API_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Le dice al navegador: "No te preocupes por la seguridad CORS"
+                    // Este es el formato clave para saltar el bloqueo CORS
                     headers: {
-                        'Content-Type': 'text/plain' // Le dice a Google: "Recíbelo sin preguntar"
+                        'Content-Type': 'text/plain;charset=utf-8'
                     },
                     body: JSON.stringify({
                         nombre: nuevoNombre.toUpperCase(),
@@ -621,11 +621,10 @@
                     })
                 });
 
-                // Como usamos no-cors, si llega aquí es que el paquete se envió con éxito
-                alert("¡" + nuevoNombre.toUpperCase() + " enviado a tu Base de Datos!");
+                alert("¡" + nuevoNombre.toUpperCase() + " guardado correctamente!");
             } catch (error) {
-                console.error("Error guardando:", error);
-                alert("Revisa tu conexión a internet.");
+                console.error("Error al guardar:", error);
+                alert("Hubo un problema de red.");
             }
         }
 

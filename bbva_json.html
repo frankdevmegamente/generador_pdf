@@ -611,10 +611,7 @@
             try {
                 await fetch(API_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Esto es vital para que Netlify y Google no peleen por seguridad
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    // Al no poner headers, el navegador lo manda como "texto plano" y pasa la seguridad
                     body: JSON.stringify({
                         nombre: nuevoNombre.toUpperCase(),
                         cuentaRetiro: nuevaCuenta

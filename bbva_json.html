@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Generador BBVA - Detalle Completo</title>
+    <style>
+        body {
+            font-family: 'Helvetica', Arial, sans-serif;
+            background: #e0e0e0;
+            margin: 0;
+            display: flex;
+        }
+
+        #sidebar {
+            width: 420px;
+            background: #072146;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+            overflow-y: auto;
+            position: fixed;
+            box-sizing: border-box;
+            z-index: 100;
+        }
+
+        #preview {
+            margin-left: 440px;
+            padding: 0;
+            background: white;
+            width: 780px;
+            height: 1050px;
+            box-sizing: border-box;
+            position: relative;
+            overflow: visible;
+        }
+
+        .sheet {
+            width: 100%;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        .form-section {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #1863BC;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 13px;
+            color: #1863BC;
+            text-transform: uppercase;
+            margin: 10px 0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 8px;
+        }
+
+        label {
+            display: block;
+            font-size: 10px;
+            color: #adb5bd;
+        }
+
+        /* Se agregó 'select' para que la lista desplegable tenga el mismo estilo */
+        input,
+        select {
+            width: 100%;
+            padding: 5px;
+            margin-top: 3px;
+            border-radius: 2px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-size: 11px;
+            background-color: white;
+            color: black;
+        }
+
+        /* Estilos Comprobante */
+        .bbva-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .logo-bbva {
+            color: #004481;
+            font-size: 32px;
+            letter-spacing: -2px;
+        }
+
+        .comp-title {
+            text-align: right;
+        }
+
+        .comp-title div:first-child {
+            font-size: 14px;
+        }
+
+        .comp-title div:last-child {
+            color: #1863BC;
+            font-size: 12px;
+        }
+
+        .client-header {
+            margin-bottom: 16px;
+        }
+
+        .client-name {
+            font-size: 14px;
+        }
+
+        .op-date {
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .section-header {
+            color: #1863BC;
+            font-size: 13px;
+            padding-bottom: 2px;
+        }
+
+        .data-row {
+            display: flex;
+            padding: 4px 0;
+            align-items: flex-start;
+        }
+
+        .data-label {
+            width: 45%;
+            color: #666;
+            font-size: 12px;
+            line-height: 1.2;
+        }
+
+        .data-value {
+            width: 55%;
+            font-size: 12px;
+            color: #444444;
+            word-break: break-all;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            color: #838383;
+            margin-top: 8px;
+            line-height: 1.3;
+            font-weight: bold;
+        }
+
+        .legal-footer {
+            font-size: 14px;
+            color: #838383;
+            margin-top: 5px;
+            padding-top: 6px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            #sidebar {
+                display: none !important;
+            }
+
+            #preview {
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                min-height: 297mm !important;
+                box-shadow: none !important;
+                position: relative !important;
+            }
+
+            .url-footer-global {
+                position: absolute !important;
+                bottom: 15px !important;
+                width: 100% !important;
+                left: 0 !important;
+                padding: 0 40px !important;
+                box-sizing: border-box !important;
+                display: flex !important;
+            }
+
+            body {
+                background: white;
+            }
+        }
+
+        .logo-bbva img {
+            width: 120px;
+            display: block;
+        }
+
+        #outTit {
+            border-bottom: 0.2px solid #dadada;
+            color: #1863BC;
+        }
+
+        #texto {
+            font-weight: 500;
+            color: #00a0df;
+            padding: 20px 0 8px 0;
+        }
+
+        #comprobante {
+            font-size: 13px;
+            color: #242424;
+            font-weight: 780;
+            text-align: right;
+        }
+
+        #transfers {
+            font-size: 15px;
+            color: #5f5f5f;
+        }
+
+        .dinero {
+            color: #00a0df;
+        }
+
+        .top-info {
+            width: 60%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #000;
+            margin-bottom: 20px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            max-width: 880px;
+            margin: 0 auto 40px auto;
+        }
+
+        .top-title {
+            font-weight: 500;
+        }
+
+        .url-footer-global {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 8.8px;
+            color: #8a8a8a;
+            z-index: 999;
+        }
+
+        @media print {
+            .url-footer-global {
+                position: fixed;
+                bottom: 15px;
+            }
+        }
+
+        .url-left {
+            max-width: 85%;
+            word-break: break-all;
+        }
+
+        .url-right {
+            white-space: nowrap;
+        }
+
+        .btn-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 350px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .banregio-btn {
+            background-color: #ffffff;
+            border: 1px solid #1a5296;
+            border-radius: 4px;
+            padding: 3px 15px;
+            min-width: 70px;
+            color: #a5a5a5;
+            font-family: 'Arial', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .banregio-btn:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="sidebar">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+            <h3>BBVA EDITOR</h3>
+            <a href="index.html" style="color:#00aaff; text-decoration:none; font-size:11px">← VOLVER</a>
+        </div>
+        <button onclick="window.print()"
+            style="width:100%; padding:10px; background:#00aaff; color:white; border:none; cursor:pointer; font-weight:bold;">GENERAR
+            PDF</button>
+        <button onclick="limpiar()"
+            style="width:100%; margin-top:5px; padding:5px; background:#444; color:white; border:none; cursor:pointer; font-size:10px;">LIMPIAR
+            DATOS</button>
+
+        <div class="form-section">
+            <h3>Encabezado y Cliente</h3>
+
+            <div class="form-group">
+                <label>Titular Principal</label>
+                <select id="inTit" onchange="autocompletarTitular(); up();">
+                    <option value="" selected>-- Selecciona un Titular --</option>
+                    <option value="COMERCIALIZADORA BELOCIO SA DE CV">COMERCIALIZADORA BELOCIO SA DE CV
+                    </option>
+                    <option value="MI EMPRESA DE PRUEBA SA DE CV">MI EMPRESA DE PRUEBA SA DE CV</option>
+                </select>
+            </div>
+
+            <div class="form-group"><label>Fecha y Hora (Ej: 16/02/2026 13:52:05 PM)</label><input type="text"
+                    id="inFecH" value="" readonly oninput="up()"></div>
+            <div class="form-group" style="display: none"><label>Fecha y Hora (Ej: 16/02/2026 13:52:05 PM)</label><input
+                    type="text" id="inFec" value="" readonly oninput="up()"></div>
+        </div>
+
+        <div class="form-section">
+            <h3>Banco Destino</h3>
+            <div class="form-row">
+                <div class="form-group"><label>SWIFT/BIC</label><input type="text" id="inSwi" value="" oninput="up()">
+                </div>
+                <div class="form-group"><label>País</label><input type="text" id="inPaiB" value="" oninput="up()">
+                </div>
+            </div>
+            <div class="form-group"><label>Banco Destino</label><input type="text" id="inBanD" value="" oninput="up()">
+            </div>
+            <div class="form-group"><label>Dirección Banco</label><input type="text" id="inDirB" value=""
+                    oninput="up()"></div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-group">
+                <label>Beneficiario</label>
+                <select id="inBen" onchange="autocompletarBeneficiario(); up();">
+                    <option value="" selected>-- Selecciona un Beneficiario --</option>
+                    <option value="ANHUI VITOTEX GLOBAL SUPPLY CHAIN CO., LTD">ANHUI VITOTEX GLOBAL SUPPLY CHAIN CO.,
+                        LTD
+                    </option>
+                    <option value="MI EMPRESA DE PRUEBA SA DE CV">MI EMPRESA DE PRUEBA SA DE CV</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Cuenta Depósito</label><input type="text" id="inCtaD" value=""
+                        oninput="up()"></div>
+                <div class="form-group"><label>País</label><input type="text" id="inPaiBen" value="" oninput="up()">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Estado/Provincia</label><input type="text" id="inEst" value=""
+                        oninput="up()"></div>
+                <div class="form-group"><label>Ciudad/Alcaldía</label><input type="text" id="inCiu" value=""
+                        oninput="up()"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Calle</label><input type="text" id="inCal" value="" oninput="up()"></div>
+                <div class="form-group"><label>Num Exterior</label><input type="text" id="inNumE" value=""
+                        oninput="up()"></div>
+            </div>
+            <div class="form-group"><label>Código Postal</label><input type="text" id="inCP" value="" oninput="up()">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Operación y Folios</h3>
+            <div class="form-row">
+                <div class="form-group"><label>Cuenta Retiro</label><input type="text" id="inCtaR"
+                        value="6212260202000000048" oninput="up()"></div>
+                <div class="form-group"><label>Importe a Cargar</label><input type="text" id="inImpC" value="18,336.20"
+                        oninput="up()"></div>
+            </div>
+            <div class="form-group"><label>Monto Divisa Enviar</label><input type="text" id="inMonE" value="18,336.20"
+                    oninput="up()"></div>
+            <div class="form-row">
+                <div class="form-group"><label>Folio Operación</label><input type="text" id="inFolO" value="4581332268"
+                        oninput="up()"></div>
+                <div class="form-group"><label>Folio Cambiario</label><input type="text" id="inFolC" value="14059784"
+                        oninput="up()"></div>
+            </div>
+            <div class="form-group"><label>UETR</label><input type="text" id="inUet"
+                    value="559460256-5655-3025-e23b-22561b153e66a" oninput="up()"></div>
+        </div>
+    </div>
+
+    <div>
+        <div id="preview">
+            <div class="top-info">
+                <div class="op-date outFecH">---</div>
+                <div class="top-title">Transferencias Internacionales</div>
+            </div>
+            <div class="sheet">
+
+                <div class="bbva-header">
+                    <div class="logo-bbva">
+                        <img src="BBVA_logo.svg.png" alt="BBVA">
+                    </div>
+                </div>
+
+                <div class="client-header">
+                    <div class="op-date outFec">---</div>
+                    <div id="comprobante">COMPROBANTE</div>
+                    <div id="texto">
+                        Mis operaciones frecuentes - Realizar una operación - Transferencias Internacionales
+                    </div>
+                    <div id="outTit" class="client-name">---</div>
+                    <div class="op-date outFecH">---</div>
+                </div>
+
+                <div class="section-header">Resultado de la transferencia</div>
+                <div class="data-row">
+                    <div class="data-label">Tipo de operación</div>
+                    <div class="data-value">TRANSFERENCIA INTERNACIONAL</div>
+                </div>
+
+                <div class="section-header">Datos del banco destino</div>
+                <div class="data-row">
+                    <div class="data-label">Código SWIFT/BIC</div>
+                    <div id="outSwi" class="data-value">---</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Banco Destino</div>
+                    <div id="outBanD" class="data-value">---</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Dirección</div>
+                    <div id="outDirB" class="data-value">---</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">País</div>
+                    <div id="outPaiB" class="data-value">---</div>
+                </div>
+
+                <div class="section-header">Datos del beneficiario</div>
+                <div class="data-row">
+                    <div class="data-label">Cuenta de depósito</div>
+                    <div id="outCtaD" class="data-value">---</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Nombre de Beneficiario</div>
+                    <div id="outBen" class="data-value">---</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">País</div>
+                    <div id="outPaiBen" class="data-value">---</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Estado o provincia</div>
+                    <div id="outEst" class="data-value">---</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Ciudad, municipio o alcaldía</div>
+                    <div id="outCiu" class="data-value">---</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Código postal</div>
+                    <div id="outCP" class="data-value">---</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Calle</div>
+                    <div id="outCal" class="data-value">---</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Número exterior</div>
+                    <div id="outNumE" class="data-value">---</div>
+                </div>
+
+                <div class="section-header">Datos de la operación</div>
+                <div class="data-row">
+                    <div class="data-label">Cuenta de retiro</div>
+                    <div id="outCtaR" class="data-value">---</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Nombre del titular</div>
+                    <div id="outTit2" class="data-value">---</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Importe a cargar a la cuenta</div>
+                    <div class="data-value dinero"><span id="outImpC">0.00</span> USD</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Importe de la divisa a enviar</div>
+                    <div class="data-value dinero"><span id="outMonE">0.00</span> USD</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Folio de operación</div>
+                    <div id="outFolO" class="data-value">---</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Folio de operación cambiaria</div>
+                    <div id="outFolC" class="data-value">---</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">Referencia Única (UETR)</div>
+                    <div id="outUet" class="data-value">---</div>
+                </div>
+
+                <div class="footer-text">
+                    La comisión por operación será aplicada el fin de mes y dependerá de la tarifa contratada para su
+                    servicio
+                    de banca en Línea.
+                </div>
+
+                <div class="legal-footer">
+                    BBVA MÉXICO S.A., INSTITUCIÓN DE BANCA MÚLTIPLE, GRUPO FINANCIERO BBVA MÉXICO
+                </div>
+                <div class="btn-wrapper">
+                    <button class="banregio-btn" onclick="window.close()">Cerrar</button>
+                    <button class="banregio-btn" onclick="window.print()">Imprimir</button>
+                </div>
+            </div>
+            <div class="url-footer-global">
+                <span class="url-left">
+                    https://empresas.bbvanet.com.mx/mexiconet2/mexiconet2/OperacionCBTFServlet?proceso=transferencias_internacionales_pr&operacion=transferen…
+                </span>
+                <span class="url-right">1/1</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // BASE DE DATOS DE TITULARES (JSON)
+        const baseDatosTitulares = {
+            "COMERCIALIZADORA BELOCIO SA DE CV": {
+                swiftbic: "CIBKCNBJ230",
+                pais: "CHINA",
+                bancoDestino: "CHINA CITIC BANK HEFEI BRANCH",
+                direccionBanco: "396 HUIZHOU ROAD"
+            },
+            "MI EMPRESA DE PRUEBA SA DE CV": {
+                swiftbic: "PRUEBA",
+                pais: "PRUEBA",
+                bancoDestino: "PRUEBA",
+                direccionBanco: "PRUEBA"
+            }
+        };
+
+        // FUNCIÓN PARA AUTOCOMPLETAR LA CUENTA
+        function autocompletarTitular() {
+            const titularSeleccionado = document.getElementById('inTit').value;
+            const datos = baseDatosTitulares[titularSeleccionado];
+
+            if (datos) {
+                document.getElementById('inSwi').value = datos.swiftbic;
+                document.getElementById('inPaiB').value = datos.pais;
+                document.getElementById('inBanD').value = datos.bancoDestino;
+                document.getElementById('inDirB').value = datos.direccionBanco;
+            } else {
+                document.getElementById('inSwi').value = "";
+                document.getElementById('inPaiB').value = "";
+                document.getElementById('inBanD').value = "";
+                document.getElementById('inDirB').value = "";
+            }
+        }
+
+        const baseDatosBeneficiarios = {
+            "ANHUI VITOTEX GLOBAL SUPPLY CHAIN CO., LTD": {
+                cuentaDeposito: "6212260202000000048",
+                pais: "CHINA",
+                estado: "ANHUI",
+                ciudad: "HEFEI CITY",
+                codigoPostal: "230000",
+                calle: "NO. 1688, SHENGXIN ROAD, ECONOMIC AND TECHNOLOGICAL DEVELOPMENT ZONE",
+                numExterior: ""
+            },
+            "MI EMPRESA DE PRUEBA SA DE CV": {
+                cuentaDeposito: "PRUEBA0987654321",
+                pais: "PRUEBA",
+                estado: "PRUEBA",
+                ciudad: "PRUEBA",
+                codigoPostal: "PRUEBA",
+                calle: "PRUEBA",
+                numExterior: "PRUEBA"
+            }
+        };
+
+        function autocompletarBeneficiario() {
+            const beneficiarioSeleccionado = document.getElementById('inBen').value;
+            const datos = baseDatosBeneficiarios[beneficiarioSeleccionado];
+
+            if (datos) {
+                document.getElementById('inCtaD').value = datos.cuentaDeposito;
+                document.getElementById('inPaiBen').value = datos.pais;
+                document.getElementById('inEst').value = datos.estado;
+                document.getElementById('inCiu').value = datos.ciudad;
+                document.getElementById('inCal').value = datos.calle;
+                document.getElementById('inNumE').value = datos.numExterior;
+                document.getElementById('inCP').value = datos.codigoPostal;
+            } else {
+                document.getElementById('inCtaD').value = "";
+                document.getElementById('inPaiBen').value = "";
+                document.getElementById('inEst').value = "";
+                document.getElementById('inCiu').value = "";
+                document.getElementById('inCal').value = "";
+                document.getElementById('inNumE').value = "";
+                document.getElementById('inCP').value = "";
+            }
+        }
+
+        function up() {
+            // Mapeo de IDs de Input a Output
+            const map = {
+                'inTit': 'outTit', 'inFec': 'outFec', 'inFecH': 'outFecH', 'inSwi': 'outSwi', 'inBanD': 'outBanD',
+                'inDirB': 'outDirB', 'inPaiB': 'outPaiB', 'inCtaD': 'outCtaD', 'inBen': 'outBen',
+                'inPaiBen': 'outPaiBen', 'inEst': 'outEst', 'inCiu': 'outCiu', 'inCP': 'outCP',
+                'inCal': 'outCal', 'inNumE': 'outNumE', 'inCtaR': 'outCtaR', 'inImpC': 'outImpC',
+                'inMonE': 'outMonE', 'inFolO': 'outFolO', 'inFolC': 'outFolC', 'inUet': 'outUet'
+            };
+
+            for (let inputId in map) {
+                const outName = map[inputId];
+                const inEl = document.getElementById(inputId);
+                if (!inEl) continue;
+                const val = inEl.value;
+                const outById = document.getElementById(outName);
+                if (outById) {
+                    outById.innerText = val;
+                } else {
+                    document.querySelectorAll('.' + outName).forEach(el => el.innerText = val);
+                }
+            }
+            // El nombre del titular se repite en la sección de operación
+            document.getElementById('outTit2').innerText = document.getElementById('inTit').value;
+        }
+
+        // Autocomplete fechas al cargar - siempre con la hora exacta del momento
+        function autocompletarFechas_hora() {
+            const pad = n => n.toString().padStart(2, '0');
+            const now = new Date();
+            const fecha = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+            const hora = pad(now.getHours());
+            const mins = pad(now.getMinutes());
+            const secs = pad(now.getSeconds());
+            const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+            const fechaHora = `${fecha} ${hora}:${mins}:${secs} ${ampm}`;
+            const inFecH = document.getElementById('inFecH');
+            if (inFecH) {
+                inFecH.value = fechaHora;
+            }
+        }
+        function autocompletarFechas() {
+            const pad = n => n.toString().padStart(2, '0');
+            const now = new Date();
+            const fecha = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+            const fecha_Hora = `${fecha}`;
+            const inFec = document.getElementById('inFec');
+            if (inFec) {
+                inFec.value = fecha_Hora;
+            }
+        }
+
+        function limpiar() {
+            if (confirm("¿Limpiar todo?")) {
+                document.querySelectorAll('input').forEach(i => i.value = "");
+                document.getElementById('inTit').value = ""; // Limpiar también el select
+                up();
+            }
+        }
+
+        // --- INICIALIZACIÓN AL ABRIR LA PÁGINA ---
+        autocompletarFechas_hora();
+        autocompletarFechas();
+        autocompletarTitular();
+        autocompletarBeneficiario(); // Llenamos la cuenta del titular seleccionado por defecto
+        up(); // Refrescamos la vista para que todo se pinte en el comprobante
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Comprobantes Bancarios</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            width: 220px;
+            padding: 30px;
+            text-align: center;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .bbva {
+            border-top: 8px solid #004481;
+        }
+
+        .banregio {
+            border-top: 8px solid #ff6600;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .instructions {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 30px;
+            max-width: 500px;
+            font-size: 13px;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .logo-txt {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Generador de Comprobantes</h1>
+    <div class="container">
+        <a href="bbva.html" class="card bbva">
+            <div class="logo-txt" style="color:#004481">BBVA</div>
+            <p style="color:#666">Internacionales</p>
+        </a>
+        <a href="banregio.html" class="card banregio">
+            <div class="logo-txt" style="color:#ff6600">banregıo</div>
+            <p style="color:#666">Operaciones</p>
+        </a>
+    </div>
+    <div class="instructions">
+        <strong>💡 Instrucción importante para el PDF:</strong><br>
+        Al dar clic en "Imprimir", busca <b>Más ajustes</b> y desmarca la casilla de <b>"Encabezados y pies de
+            página"</b> para que el PDF salga limpio sin rutas de archivo.
+    </div>
+</body>
+
+</html>

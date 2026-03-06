@@ -475,7 +475,7 @@
                     <div id="texto">
                         Mis operaciones frecuentes - Realizar una operación - Transferencias Internacionales
                     </div>
-                    <div id="outTit" class="client-name">---</div>
+                    <div id="outTit" class="client-name" style="padding-bottom: 5px;">---</div>
                     <div class="op-date outFecH">---</div>
                 </div>
 
@@ -656,7 +656,7 @@
         let baseDatosTitulares = {};
         let baseDatosBeneficiarios = {};
 
-        // --- 1. LECTURA DESDE GOOGLE SHEETS ---
+        //Aqui se lee el archivo de google sheets y se cargan los datos 
         async function cargarDatosDesdeSheets() {
             const selectTitular = document.getElementById('inTit');
             const selectBeneficiario = document.getElementById('inBen');
@@ -681,7 +681,7 @@
             }
         }
 
-        // --- 2. DIBUJAR LOS MENÚS DESPLEGABLES ---
+        //funcion para cargar los select del archivo de google sheets
         function cargarSelectTitulares() {
             const selectTitular = document.getElementById('inTit');
             selectTitular.innerHTML = '<option value="" selected>-- Selecciona un Titular --</option>';
@@ -706,7 +706,7 @@
             }
         }
 
-        // --- 3. GUARDADO DIRECTO DESDE EL PANEL (TITULAR) ---
+        //funcion para validar si el titular ya existe o no, si no es asi guarda los datos en google sheets 
         async function guardarTitularPanel() {
             const nuevoNombre = document.getElementById('modNomTit').value.trim();
             const nuevaCuenta = document.getElementById('modCtaTit').value.trim();
@@ -751,7 +751,8 @@
             }
         }
 
-        // --- 4. GUARDADO DIRECTO DESDE EL PANEL (BENEFICIARIO) ---
+        //funcion para validar si el beneficiario ya existe o no, si no es asi guarda los datos en google sheets
+        //ademas de guardar el beneficiario, guarda los bancos asociados a ese beneficiario, si es que se agregaron en la lista temporal
         let bancosTemporales = [];
 
         function agregarBancoTemporal() {

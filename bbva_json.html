@@ -688,7 +688,7 @@
                 alert("Por favor llena ambos campos.");
                 return;
             }
-
+            const nombreMayusculas = nuevoNombre.toUpperCase();
             if (baseDatosTitulares[nombreMayusculas]) {
                 alert("Este titular ya existe en tu base de datos.");
                 document.getElementById('modNomTit').focus();

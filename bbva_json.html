@@ -689,6 +689,12 @@
                 return;
             }
 
+            if (baseDatosTitulares[nombreMayusculas]) {
+                alert("Este titular ya existe en tu base de datos.");
+                document.getElementById('modNomTit').focus();
+                return;
+            }
+
             const btnGuardar = document.getElementById('btnGuardarModal');
 
             // Cambiamos el texto del botón mientras carga

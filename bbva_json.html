@@ -391,6 +391,9 @@
         <button onclick="abrirModalTitular()"
             style="width:100%; margin-top:5px; padding:5px; background:#28a745; color:white; border:none; cursor:pointer; font-size:10px; font-weight:bold;">+
             NUEVO TITULAR</button>
+        <button onclick="abrirModalBeneficiario()"
+            style="width:100%; margin-top:5px; padding:5px; background:#0055ff; color:white; border:none; cursor:pointer; font-size:10px; font-weight:bold;">+
+            NUEVO BENEFICIARIO</button>
         <div style="display:flex; justify-content:space-between; align-items:center">
             <h3>BBVA EDITOR</h3>
             <a href="index.html" style="color:#00aaff; text-decoration:none; font-size:11px">← VOLVER</a>
@@ -651,21 +654,42 @@
             }
         }
 
-        // 2. LEER DATOS DESDE GOOGLE SHEETS
+        // LEER DATOS DESDE GOOGLE SHEETS
         async function cargarDatosDesdeSheets() {
             const selectTitular = document.getElementById('inTit');
-            selectTitular.innerHTML = '<option value="">Cargando titulares desde la nube...</option>';
+            const selectBeneficiario = document.getElementById('inBen');
+
+            selectTitular.innerHTML = '<option value="">Cargando datos...</option>';
+            selectBeneficiario.innerHTML = '<option value="">Cargando datos...</option>';
 
             try {
                 const respuesta = await fetch(API_URL);
-                const datos = await respuesta.json();
+                const datos = await respuesta.json(); // Ahora trae un objeto doble
 
-                baseDatosTitulares = datos; // Reemplazamos los datos locales con los de la nube
-                cargarSelectTitulares();    // Volvemos a dibujar el menú
+                // Separamos la información
+                baseDatosTitulares = datos.titulares || {};
+                baseDatosBeneficiarios = datos.beneficiarios || {};
+
+                cargarSelectTitulares();
+                cargarSelectBeneficiarios();
 
             } catch (error) {
                 console.error("Error leyendo Google Sheets:", error);
-                selectTitular.innerHTML = '<option value="">Error al cargar titulares</option>';
+                selectTitular.innerHTML = '<option value="">Error de carga</option>';
+                selectBeneficiario.innerHTML = '<option value="">Error de carga</option>';
+            }
+        }
+
+        // DIBUJAR EL MENÚ DESPLEGABLE DE BENEFICIARIOS
+        function cargarSelectBeneficiarios() {
+            const selectBen = document.getElementById('inBen');
+            selectBen.innerHTML = '<option value="" selected>-- Selecciona un Beneficiario --</option>';
+
+            for (const nombreBen in baseDatosBeneficiarios) {
+                const option = document.createElement('option');
+                option.value = nombreBen;
+                option.text = nombreBen;
+                selectBen.appendChild(option);
             }
         }
 
@@ -710,6 +734,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({
+                        tipo: "titular",
                         nombre: nuevoNombre.toUpperCase(),
                         cuentaRetiro: nuevaCuenta
                     })
@@ -940,6 +965,122 @@
             }
         }
 
+        // Variable para guardar los bancos antes de enviarlos a la nube
+        let bancosTemporales = [];
+
+        function abrirModalBeneficiario() {
+            document.getElementById('modalBeneficiario').style.display = 'flex';
+            // Limpiamos todo al abrir
+            document.querySelectorAll('#modalBeneficiario input').forEach(i => i.value = '');
+            bancosTemporales = [];
+            actualizarListaBancos();
+        }
+
+        function cerrarModalBeneficiario() {
+            document.getElementById('modalBeneficiario').style.display = 'none';
+        }
+
+        function agregarBancoTemporal() {
+            const nom = document.getElementById('modBanNom').value.trim().toUpperCase();
+            const swi = document.getElementById('modBanSwi').value.trim().toUpperCase();
+            const pai = document.getElementById('modBanPai').value.trim().toUpperCase();
+            const dir = document.getElementById('modBanDir').value.trim().toUpperCase();
+
+            if (!nom || !swi) {
+                alert("Para agregar un banco, mínimo necesitas escribir su Nombre y su SWIFT.");
+                return;
+            }
+
+            // Agregamos el banco a nuestro "carrito" invisible
+            bancosTemporales.push({ nombre: nom, swift: swi, pais: pai, direccion: dir });
+
+            // Limpiamos SOLO los inputs del banco para que puedas agregar otro
+            document.getElementById('modBanNom').value = '';
+            document.getElementById('modBanSwi').value = '';
+            document.getElementById('modBanPai').value = '';
+            document.getElementById('modBanDir').value = '';
+
+            actualizarListaBancos();
+        }
+
+        // Dibuja la lista en pantalla con un botón (X) para borrar si te equivocas
+        function actualizarListaBancos() {
+            const ul = document.getElementById('listaBancosTemporales');
+            ul.innerHTML = '';
+
+            if (bancosTemporales.length === 0) {
+                ul.innerHTML = '<li><i>Aún no hay bancos en la lista...</i></li>';
+                return;
+            }
+
+            bancosTemporales.forEach((banco, index) => {
+                ul.innerHTML += `<li style="margin-bottom: 4px;">
+            <b>${banco.nombre}</b> (SWIFT: ${banco.swift}) 
+            <span style="color:red; cursor:pointer; margin-left:10px; font-weight:bold;" onclick="quitarBancoTemporal(${index})">[X] borrar</span>
+        </li>`;
+            });
+        }
+
+        function quitarBancoTemporal(index) {
+            bancosTemporales.splice(index, 1);
+            actualizarListaBancos();
+        }
+
+        async function guardarBeneficiarioModal() {
+            const nombre = document.getElementById('modNomBen').value.trim().toUpperCase();
+
+            if (!nombre) {
+                alert("El nombre del beneficiario es obligatorio.");
+                return;
+            }
+
+            if (bancosTemporales.length === 0) {
+                alert("Debes agregar al menos un banco a la lista antes de guardar al beneficiario.");
+                return;
+            }
+
+            const btnGuardar = document.getElementById('btnGuardarBen');
+            btnGuardar.innerText = "Guardando...";
+            btnGuardar.disabled = true;
+
+            // Preparamos el paquete de datos
+            const paquete = {
+                tipo: "beneficiario", // ¡Clave para Google Sheets!
+                nombre: nombre,
+                cuentaDeposito: document.getElementById('modCtaBen').value.trim(),
+                pais: document.getElementById('modPaiBen').value.trim().toUpperCase(),
+                estado: document.getElementById('modEstBen').value.trim().toUpperCase(),
+                ciudad: document.getElementById('modCiuBen').value.trim().toUpperCase(),
+                codigoPostal: document.getElementById('modCPBen').value.trim(),
+                calle: document.getElementById('modCalBen').value.trim().toUpperCase(),
+                numExterior: document.getElementById('modNumBen').value.trim(),
+                bancos: bancosTemporales // Mandamos la lista completa de bancos
+            };
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(paquete)
+                });
+
+                cerrarModalBeneficiario();
+                alert("¡Beneficiario guardado en la nube!");
+
+                baseDatosBeneficiarios[nombre] = paquete; // Lo guarda en la memoria actual
+                cargarSelectBeneficiarios(); // Redibuja el menú
+
+
+
+            } catch (error) {
+                console.error("Error al guardar:", error);
+                alert("Hubo un error de red al subirlo a la nube.");
+            } finally {
+                btnGuardar.innerText = "Guardar Beneficiario";
+                btnGuardar.disabled = false;
+            }
+        }
+
         // --- INICIALIZACIÓN AL ABRIR LA PÁGINA ---
         cargarDatosDesdeSheets();
         autocompletarFechas_hora();
@@ -964,6 +1105,48 @@
             <div class="modal-buttons">
                 <button class="btn-cancelar" onclick="cerrarModalTitular()">Cancelar</button>
                 <button class="btn-guardar" id="btnGuardarModal" onclick="guardarDesdeModal()">Guardar Titular</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalBeneficiario" class="modal-overlay">
+        <div class="modal-content" style="width: 500px; max-height: 90vh; overflow-y: auto;">
+            <h3>Agregar Nuevo Beneficiario</h3>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div><label>Nombre Beneficiario:</label><input type="text" id="modNomBen"></div>
+                <div><label>Cuenta Depósito:</label><input type="text" id="modCtaBen"></div>
+                <div><label>País:</label><input type="text" id="modPaiBen"></div>
+                <div><label>Estado/Provincia:</label><input type="text" id="modEstBen"></div>
+                <div><label>Ciudad/Alcaldía:</label><input type="text" id="modCiuBen"></div>
+                <div><label>Código Postal:</label><input type="text" id="modCPBen"></div>
+                <div><label>Calle:</label><input type="text" id="modCalBen"></div>
+                <div><label>Num Exterior:</label><input type="text" id="modNumBen"></div>
+            </div>
+
+            <h4
+                style="color: #1863BC; border-bottom: 1px solid #ccc; margin-top: 15px; padding-bottom: 5px; font-size: 13px;">
+                Bancos Asociados</h4>
+            <div style="background: #f1f5fa; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div><label>Nombre del Banco:</label><input type="text" id="modBanNom"
+                            placeholder="Ej. BANK OF CHINA"></div>
+                    <div><label>SWIFT:</label><input type="text" id="modBanSwi"></div>
+                    <div><label>País del Banco:</label><input type="text" id="modBanPai"></div>
+                    <div><label>Dirección Banco:</label><input type="text" id="modBanDir"></div>
+                </div>
+                <button onclick="agregarBancoTemporal()"
+                    style="margin-top: 10px; width: 100%; padding: 6px; background: #00a0df; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">+
+                    Añadir banco a la lista</button>
+            </div>
+
+            <ul id="listaBancosTemporales" style="font-size: 11px; padding-left: 20px; color: #444; min-height: 40px;">
+            </ul>
+
+            <div class="modal-buttons">
+                <button class="btn-cancelar" onclick="cerrarModalBeneficiario()">Cancelar</button>
+                <button class="btn-guardar" id="btnGuardarBen" onclick="guardarBeneficiarioModal()">Guardar
+                    Beneficiario</button>
             </div>
         </div>
     </div>

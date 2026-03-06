@@ -27,7 +27,6 @@
         #preview {
             margin-left: 440px;
             margin-right: 380px;
-            /* Espacio para el panel derecho */
             padding: 0;
             background: white;
             width: 780px;
@@ -374,9 +373,13 @@
             <h3>Encabezado y Cliente</h3>
             <div class="form-group">
                 <label>Titular Principal</label>
-                <select id="inTit" onchange="autocompletarTitular(); up();">
-                    <option value="" selected>-- Selecciona un Titular --</option>
-                </select>
+                <div style="display: flex; gap: 5px;">
+                    <select id="inTit" onchange="autocompletarTitular(); up();" style="width: 100%;">
+                        <option value="" selected>-- Selecciona un Titular --</option>
+                    </select>
+                    <button onclick="cargarParaEditarTitular()"
+                        style="background:#ff9900; color:white; border:none; border-radius:2px; cursor:pointer; font-size:10px; padding: 0 8px; font-weight:bold;">EDITAR</button>
+                </div>
             </div>
             <div class="form-group"><label>Fecha y Hora (Ej: 16/02/2026 13:52:05 PM)</label><input type="text"
                     id="inFecH" value="" readonly oninput="up()"></div>
@@ -387,9 +390,13 @@
         <div class="form-section">
             <div class="form-group">
                 <label>Beneficiario</label>
-                <select id="inBen" onchange="autocompletarBeneficiario(); up();">
-                    <option value="" selected>-- Selecciona un Beneficiario --</option>
-                </select>
+                <div style="display: flex; gap: 5px;">
+                    <select id="inBen" onchange="autocompletarBeneficiario(); up();" style="width: 100%;">
+                        <option value="" selected>-- Selecciona un Beneficiario --</option>
+                    </select>
+                    <button onclick="cargarParaEditarBeneficiario()"
+                        style="background:#ff9900; color:white; border:none; border-radius:2px; cursor:pointer; font-size:10px; padding: 0 8px; font-weight:bold;">EDITAR</button>
+                </div>
             </div>
             <div class="form-row">
                 <div class="form-group"><label>Cuenta Depósito</label><input type="text" id="inCtaD" value=""
@@ -401,16 +408,19 @@
                 <div class="form-group"><label>Estado/Provincia</label><input type="text" id="inEst" value=""
                         oninput="up()"></div>
                 <div class="form-group"><label>Ciudad/Alcaldía</label><input type="text" id="inCiu" value=""
-                        oninput="up()"></div>
+                        oninput="up()">
+                </div>
             </div>
             <div class="form-row">
                 <div class="form-group"><label>Calle</label><input type="text" id="inCal" value="" oninput="up()"></div>
                 <div class="form-group"><label>Num Exterior</label><input type="text" id="inNumE" value=""
-                        oninput="up()"></div>
+                        oninput="up()">
+                </div>
             </div>
             <div class="form-row">
                 <div class="form-group"><label>Código Postal</label><input type="text" id="inCP" value=""
-                        oninput="up()"></div>
+                        oninput="up()">
+                </div>
                 <div class="form-group">
                     <label>Banco</label>
                     <select id="inBan" onchange="autocompletarBancoDestino(); up();">
@@ -431,15 +441,16 @@
             <div class="form-group"><label>Banco Destino</label><input type="text" id="inBanD" value="" oninput="up()">
             </div>
             <div class="form-group"><label>Dirección Banco</label><input type="text" id="inDirB" value=""
-                    oninput="up()"></div>
+                    oninput="up()">
+            </div>
         </div>
-
 
         <div class="form-section">
             <h3>Operación y Folios</h3>
             <div class="form-row">
                 <div class="form-group"><label>Cuenta Retiro</label><input type="text" id="inCtaR" value=""
-                        oninput="up()"></div>
+                        oninput="up()">
+                </div>
                 <div class="form-group"><label>Importe a Cargar</label><input type="text" id="inImpC"
                         placeholder="$10,000.00" value="" oninput="up()"></div>
             </div>
@@ -569,8 +580,7 @@
 
                 <div class="footer-text">
                     La comisión por operación será aplicada el fin de mes y dependerá de la tarifa contratada para su
-                    servicio
-                    de banca en Línea.
+                    servicio de banca en Línea.
                 </div>
 
                 <div class="legal-footer">
@@ -599,8 +609,8 @@
                 <input type="text" id="modNomTit" placeholder="Ej. EMPRESA SA DE CV">
             </div>
             <div class="form-group">
-                <label>Cuenta de Retiro (18 dígitos):</label>
-                <input type="text" id="modCtaTit" placeholder="Ej. 123456789012345678">
+                <label>Cuenta de Retiro:</label>
+                <input type="text" id="modCtaTit" placeholder="Ej. 12443178901">
             </div>
             <button class="btn-guardar" id="btnGuardarModal" onclick="guardarTitularPanel()"
                 style="width: 100%; margin-top: 10px;">Guardar Titular</button>
@@ -608,16 +618,16 @@
 
         <div class="panel-card">
             <h3>+ Agregar Nuevo Beneficiario</h3>
-            <div class="form-group"><label>Nombre Beneficiario:</label><input type="text" id="modNomBen"></div>
+            <div class="form-group"><label>Beneficiario:</label><input type="text" id="modNomBen"></div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                <div class="form-group"><label>Cta. Depósito:</label><input type="text" id="modCtaBen"></div>
+                <div class="form-group"><label>Cuenta Depósito:</label><input type="text" id="modCtaBen"></div>
                 <div class="form-group"><label>País:</label><input type="text" id="modPaiBen"></div>
-                <div class="form-group"><label>Estado/Prov:</label><input type="text" id="modEstBen"></div>
-                <div class="form-group"><label>Ciudad:</label><input type="text" id="modCiuBen"></div>
+                <div class="form-group"><label>Estado/Provincia:</label><input type="text" id="modEstBen"></div>
+                <div class="form-group"><label>Ciudad/Alcaldía:</label><input type="text" id="modCiuBen"></div>
                 <div class="form-group"><label>Calle:</label><input type="text" id="modCalBen"></div>
-                <div class="form-group"><label>Num Ext:</label><input type="text" id="modNumBen"></div>
-                <div class="form-group"><label>C. Postal:</label><input type="text" id="modCPBen"></div>
+                <div class="form-group"><label>Num Exterior:</label><input type="text" id="modNumBen"></div>
+                <div class="form-group"><label>Código Postal:</label><input type="text" id="modCPBen"></div>
             </div>
 
             <h4
@@ -626,10 +636,10 @@
 
             <div
                 style="background: #f1f5fa; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #e0e5eb;">
-                <div class="form-group"><label>Nombre del Banco:</label><input type="text" id="modBanNom"
+                <div class="form-group"><label>Banco Destino:</label><input type="text" id="modBanNom"
                         placeholder="Ej. BANK OF CHINA"></div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                    <div class="form-group"><label>SWIFT:</label><input type="text" id="modBanSwi"></div>
+                    <div class="form-group"><label>SWIFT/BIC:</label><input type="text" id="modBanSwi"></div>
                     <div class="form-group"><label>País Banco:</label><input type="text" id="modBanPai"></div>
                 </div>
                 <div class="form-group"><label>Dirección Banco:</label><input type="text" id="modBanDir"></div>
@@ -651,12 +661,12 @@
 
     <script>
         // URL DE GOOGLE 
-        const API_URL = "https://script.google.com/macros/s/AKfycbweC71I4K9vCjVOb5dBy7fwS9VL1vsgyAUt3Y6Fre1DQIU5UBgVDfv_6-kQ4vkcO2f_/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbydqyZ8opyE9-NXuSJvHv2cBzruNLtAN4g4UtXCKBDRZgf1SKgz71XUAjDmP2qIxSeP/exec";
 
         let baseDatosTitulares = {};
         let baseDatosBeneficiarios = {};
 
-        //Aqui se lee el archivo de google sheets y se cargan los datos 
+        // --- 1. LECTURA DESDE GOOGLE SHEETS ---
         async function cargarDatosDesdeSheets() {
             const selectTitular = document.getElementById('inTit');
             const selectBeneficiario = document.getElementById('inBen');
@@ -681,7 +691,7 @@
             }
         }
 
-        //funcion para cargar los select del archivo de google sheets
+        // --- 2. DIBUJAR LOS MENÚS DESPLEGABLES ---
         function cargarSelectTitulares() {
             const selectTitular = document.getElementById('inTit');
             selectTitular.innerHTML = '<option value="" selected>-- Selecciona un Titular --</option>';
@@ -706,27 +716,54 @@
             }
         }
 
-        //funcion para validar si el titular ya existe o no, si no es asi guarda los datos en google sheets 
+        // --- 3. CARGAR PARA EDITAR ---
+        function cargarParaEditarTitular() {
+            const nombre = document.getElementById('inTit').value;
+            if (!nombre) {
+                alert("Selecciona un titular de la lista primero."); return;
+            }
+            const datos = baseDatosTitulares[nombre];
+            document.getElementById('modNomTit').value = nombre;
+            document.getElementById('modCtaTit').value = datos.cuentaRetiro || "";
+        }
+
+        function cargarParaEditarBeneficiario() {
+            const nombre = document.getElementById('inBen').value;
+            if (!nombre) {
+                alert("Selecciona un beneficiario de la lista primero."); return;
+            }
+            const datos = baseDatosBeneficiarios[nombre];
+            document.getElementById('modNomBen').value = nombre;
+            document.getElementById('modCtaBen').value = datos.cuentaDeposito || "";
+            document.getElementById('modPaiBen').value = datos.pais || "";
+            document.getElementById('modEstBen').value = datos.estado || "";
+            document.getElementById('modCiuBen').value = datos.ciudad || "";
+            document.getElementById('modCPBen').value = datos.codigoPostal || "";
+            document.getElementById('modCalBen').value = datos.calle || "";
+            document.getElementById('modNumBen').value = datos.numExterior || "";
+
+            bancosTemporales = datos.bancos ? JSON.parse(JSON.stringify(datos.bancos)) : [];
+            actualizarListaBancos();
+        }
+
+        // --- 4. GUARDADO DIRECTO DESDE EL PANEL (TITULAR) ---
         async function guardarTitularPanel() {
             const nuevoNombre = document.getElementById('modNomTit').value.trim();
             const nuevaCuenta = document.getElementById('modCtaTit').value.trim();
 
             if (!nuevoNombre || !nuevaCuenta) {
-                alert("Por favor llena ambos campos del titular.");
-                return;
+                alert("Por favor llena ambos campos del titular."); return;
             }
 
             const nombreMayusculas = nuevoNombre.toUpperCase();
 
             if (baseDatosTitulares[nombreMayusculas]) {
-                alert("⚠️ Este titular ya existe en tu base de datos.");
-                document.getElementById('modNomTit').focus();
-                return;
+                const confirmar = confirm("⚠️ Este titular ya existe. ¿Deseas actualizar/sobreescribir sus datos?");
+                if (!confirmar) return;
             }
 
             const btnGuardar = document.getElementById('btnGuardarModal');
-            btnGuardar.innerText = "Guardando...";
-            btnGuardar.disabled = true;
+            btnGuardar.innerText = "Guardando..."; btnGuardar.disabled = true;
 
             baseDatosTitulares[nombreMayusculas] = { cuentaRetiro: nuevaCuenta };
             cargarSelectTitulares();
@@ -740,19 +777,17 @@
 
                 document.getElementById('modNomTit').value = '';
                 document.getElementById('modCtaTit').value = '';
-                alert("¡Titular guardado exitosamente!");
+                alert("¡Titular guardado/actualizado exitosamente!");
 
             } catch (error) {
                 console.error("Error al guardar:", error);
                 alert("Se guardó temporalmente, pero hubo un error de red.");
             } finally {
-                btnGuardar.innerText = "Guardar Titular";
-                btnGuardar.disabled = false;
+                btnGuardar.innerText = "Guardar Titular"; btnGuardar.disabled = false;
             }
         }
 
-        //funcion para validar si el beneficiario ya existe o no, si no es asi guarda los datos en google sheets
-        //ademas de guardar el beneficiario, guarda los bancos asociados a ese beneficiario, si es que se agregaron en la lista temporal
+        // --- 5. GUARDADO DIRECTO DESDE EL PANEL (BENEFICIARIO) ---
         let bancosTemporales = [];
 
         function agregarBancoTemporal() {
@@ -802,24 +837,20 @@
             const nombre = document.getElementById('modNomBen').value.trim().toUpperCase();
 
             if (!nombre) {
-                alert("El nombre del beneficiario es obligatorio.");
-                return;
+                alert("El nombre del beneficiario es obligatorio."); return;
             }
 
             if (baseDatosBeneficiarios[nombre]) {
-                alert("⚠️ Este beneficiario ya existe en la base de datos.");
-                document.getElementById('modNomBen').focus();
-                return;
+                const confirmar = confirm("⚠️ Este beneficiario ya existe. ¿Deseas actualizar/sobreescribir sus datos y sus bancos?");
+                if (!confirmar) return;
             }
 
             if (bancosTemporales.length === 0) {
-                alert("Debes agregar al menos un banco a la lista antes de guardar.");
-                return;
+                alert("Debes agregar al menos un banco a la lista antes de guardar."); return;
             }
 
             const btnGuardar = document.getElementById('btnGuardarBen');
-            btnGuardar.innerText = "Guardando...";
-            btnGuardar.disabled = true;
+            btnGuardar.innerText = "Guardando..."; btnGuardar.disabled = true;
 
             const paquete = {
                 tipo: "beneficiario",
@@ -847,18 +878,17 @@
                 document.querySelectorAll('#right-panel input').forEach(i => i.value = '');
                 bancosTemporales = [];
                 actualizarListaBancos();
-                alert("¡Beneficiario guardado exitosamente!");
+                alert("¡Beneficiario guardado/actualizado exitosamente!");
 
             } catch (error) {
                 console.error("Error al guardar:", error);
                 alert("Hubo un error de red al subirlo a la nube.");
             } finally {
-                btnGuardar.innerText = "Guardar Beneficiario";
-                btnGuardar.disabled = false;
+                btnGuardar.innerText = "Guardar Beneficiario"; btnGuardar.disabled = false;
             }
         }
 
-        // --- 5. LÓGICA DE AUTOCOMPLETADO ---
+        // --- 6. LÓGICA DE AUTOCOMPLETADO ---
         function autocompletarTitular() {
             const titularSeleccionado = document.getElementById('inTit').value;
             const datos = baseDatosTitulares[titularSeleccionado];
@@ -937,7 +967,7 @@
             document.getElementById('inDirB').value = "";
         }
 
-        // --- 6. FUNCIONES DE FECHA, FOLIOS Y RENDERIZADO VISUAL ---
+        // --- 7. FUNCIONES DE FECHA, FOLIOS Y RENDERIZADO VISUAL ---
         function generarDatosRandom() {
             const folioO = Math.floor(1000000000 + Math.random() * 9000000000);
             document.getElementById('inFolO').value = folioO;
@@ -1008,7 +1038,7 @@
             }
         }
 
-        // --- 7. INICIALIZACIÓN AL ABRIR LA PÁGINA ---
+        // --- 8. INICIALIZACIÓN AL ABRIR LA PÁGINA ---
         cargarDatosDesdeSheets();
         autocompletarFechas_hora();
         autocompletarFechas();

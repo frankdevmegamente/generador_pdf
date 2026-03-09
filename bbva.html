@@ -666,7 +666,7 @@
         let baseDatosTitulares = {};
         let baseDatosBeneficiarios = {};
 
-        // --- 1. LECTURA DESDE GOOGLE SHEETS ---
+        //LECTURA DESDE GOOGLE SHEETS
         async function cargarDatosDesdeSheets() {
             const selectTitular = document.getElementById('inTit');
             const selectBeneficiario = document.getElementById('inBen');
@@ -691,7 +691,7 @@
             }
         }
 
-        // --- 2. DIBUJAR LOS MENÚS DESPLEGABLES ---
+        //DIBUJAR LOS MENÚS DESPLEGABLES
         function cargarSelectTitulares() {
             const selectTitular = document.getElementById('inTit');
             selectTitular.innerHTML = '<option value="" selected>-- Selecciona un Titular --</option>';
@@ -716,7 +716,7 @@
             }
         }
 
-        // --- 3. CARGAR PARA EDITAR ---
+        //CARGAR PARA EDITAR
         function cargarParaEditarTitular() {
             const nombre = document.getElementById('inTit').value;
             if (!nombre) {
@@ -746,7 +746,7 @@
             actualizarListaBancos();
         }
 
-        // --- 4. GUARDADO DIRECTO DESDE EL PANEL (TITULAR) ---
+        //GUARDADO DIRECTO DESDE EL PANEL (TITULAR)
         async function guardarTitularPanel() {
             const nuevoNombre = document.getElementById('modNomTit').value.trim();
             const nuevaCuenta = document.getElementById('modCtaTit').value.trim();
@@ -787,7 +787,7 @@
             }
         }
 
-        // --- 5. GUARDADO DIRECTO DESDE EL PANEL (BENEFICIARIO) ---
+        //GUARDADO DIRECTO DESDE EL PANEL (BENEFICIARIO)
         let bancosTemporales = [];
 
         function agregarBancoTemporal() {
@@ -888,7 +888,7 @@
             }
         }
 
-        // --- 6. LÓGICA DE AUTOCOMPLETADO ---
+        //LOGICA DE AUTOCOMPLETADO
         function autocompletarTitular() {
             const titularSeleccionado = document.getElementById('inTit').value;
             const datos = baseDatosTitulares[titularSeleccionado];
@@ -967,7 +967,7 @@
             document.getElementById('inDirB').value = "";
         }
 
-        // --- 7. FUNCIONES DE FECHA, FOLIOS Y RENDERIZADO VISUAL ---
+        //FUNCIONES DE FECHA, FOLIOS Y RENDERIZADO VISUAL
         function generarDatosRandom() {
             const folioO = Math.floor(1000000000 + Math.random() * 9000000000);
             document.getElementById('inFolO').value = folioO;
@@ -1038,7 +1038,7 @@
             }
         }
 
-        // --- 8. INICIALIZACIÓN AL ABRIR LA PÁGINA ---
+        //INICIALIZACIÓN AL ABRIR LA PÁGINA
         cargarDatosDesdeSheets();
         autocompletarFechas_hora();
         autocompletarFechas();

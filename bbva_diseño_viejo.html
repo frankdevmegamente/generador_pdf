@@ -1,0 +1,1368 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Generador BBVA - Detalle Completo</title>
+    <style>
+      body {
+        font-family: "Helvetica", Arial, sans-serif;
+        background: #e0e0e0;
+        margin: 0;
+        display: flex;
+      }
+
+      #sidebar {
+        width: 420px;
+        background: #072146;
+        color: white;
+        padding: 20px;
+        height: 100vh;
+        overflow-y: auto;
+        position: fixed;
+        box-sizing: border-box;
+        z-index: 100;
+      }
+
+      #preview {
+        margin-left: 440px;
+        margin-right: 380px;
+        padding: 0;
+        background: white;
+        width: 780px;
+        height: 1050px;
+        box-sizing: border-box;
+        position: relative;
+        overflow: visible;
+      }
+
+      .sheet {
+        width: 100%;
+        padding: 40px;
+        box-sizing: border-box;
+      }
+
+      .form-section {
+        margin-bottom: 15px;
+        border-bottom: 1px solid #1863bc;
+        padding-bottom: 10px;
+      }
+
+      h3 {
+        font-size: 13px;
+        color: #1863bc;
+        text-transform: uppercase;
+        margin: 10px 0;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .form-group {
+        margin-bottom: 8px;
+      }
+
+      label {
+        display: block;
+        font-size: 10px;
+        color: #adb5bd;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 5px;
+        margin-top: 3px;
+        border-radius: 2px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        font-size: 11px;
+        background-color: white;
+        color: black;
+      }
+
+      /* Estilos Comprobante */
+      .bbva-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+      }
+
+      .logo-bbva {
+        color: #004481;
+        font-size: 32px;
+        letter-spacing: -2px;
+      }
+
+      .comp-title {
+        text-align: right;
+      }
+
+      .comp-title div:first-child {
+        font-size: 14px;
+      }
+
+      .comp-title div:last-child {
+        color: #1863bc;
+        font-size: 12px;
+      }
+
+      .client-header {
+        margin-bottom: 16px;
+      }
+
+      .client-name {
+        font-size: 14px;
+      }
+
+      .op-date {
+        font-size: 12px;
+        margin-top: 2px;
+      }
+
+      .section-header {
+        color: #1863bc;
+        font-size: 13px;
+        padding-bottom: 2px;
+      }
+
+      .data-row {
+        display: flex;
+        padding: 4px 0;
+        align-items: flex-start;
+      }
+
+      .data-label {
+        width: 45%;
+        color: #666;
+        font-size: 12px;
+        line-height: 1.2;
+      }
+
+      .data-value {
+        width: 55%;
+        font-size: 12px;
+        color: #444444;
+        word-break: break-all;
+      }
+
+      .footer-text {
+        font-size: 14px;
+        color: #838383;
+        margin-top: 8px;
+        line-height: 1.3;
+        font-weight: bold;
+      }
+
+      .legal-footer {
+        font-size: 14px;
+        color: #838383;
+        margin-top: 5px;
+        padding-top: 6px;
+        text-align: left;
+        font-weight: bold;
+      }
+
+      .logo-bbva img {
+        width: 120px;
+        display: block;
+      }
+
+      #outTit {
+        border-bottom: 0.2px solid #dadada;
+        color: #1863bc;
+      }
+
+      #texto {
+        font-weight: 500;
+        color: #00a0df;
+        padding: 20px 0 8px 0;
+      }
+
+      #comprobante {
+        font-size: 13px;
+        color: #242424;
+        font-weight: 780;
+        text-align: right;
+      }
+
+      #transfers {
+        font-size: 15px;
+        color: #5f5f5f;
+      }
+
+      .dinero {
+        color: #00a0df;
+      }
+
+      .top-info {
+        width: 60%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: #000;
+        margin-bottom: 20px;
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        max-width: 880px;
+        margin: 0 auto 40px auto;
+      }
+
+      .top-title {
+        font-weight: 500;
+      }
+
+      .url-footer-global {
+        position: absolute;
+        bottom: 10px;
+        left: 0;
+        right: 0;
+        padding: 0 40px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 8.8px;
+        color: #8a8a8a;
+        z-index: 999;
+      }
+
+      .url-left {
+        max-width: 85%;
+        word-break: break-all;
+      }
+
+      .url-right {
+        white-space: nowrap;
+      }
+
+      .btn-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        max-width: 350px;
+        margin: 20px auto;
+        padding: 0 20px;
+      }
+
+      .banregio-btn {
+        background-color: #ffffff;
+        border: 1px solid #1a5296;
+        border-radius: 4px;
+        padding: 3px 15px;
+        min-width: 70px;
+        color: #a5a5a5;
+        font-family: "Arial", sans-serif;
+        font-size: 12px;
+        cursor: pointer;
+        outline: none;
+      }
+
+      .banregio-btn:hover {
+        background-color: #f5f5f5;
+      }
+
+      /* --- ESTILOS DEL PANEL DERECHO --- */
+      #right-panel {
+        width: 380px;
+        background: #f4f6f9;
+        border-left: 2px solid #d1d5db;
+        padding: 20px;
+        height: 100vh;
+        overflow-y: auto;
+        position: fixed;
+        right: 0;
+        top: 0;
+        box-sizing: border-box;
+        z-index: 100;
+      }
+
+      .panel-card {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+        border: 1px solid #e5e7eb;
+      }
+
+      .panel-card h3 {
+        margin-top: 0;
+        color: #1863bc;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 8px;
+        font-size: 14px;
+      }
+
+      .btn-guardar {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      .btn-guardar:disabled {
+        background: #88cfa0;
+        cursor: not-allowed;
+      }
+
+      @media print {
+        @page {
+          size: A4;
+          margin: 0;
+        }
+
+        #sidebar,
+        #right-panel {
+          display: none !important;
+        }
+
+        #preview {
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
+          min-height: 297mm !important;
+          box-shadow: none !important;
+          position: relative !important;
+        }
+
+        .url-footer-global {
+          position: fixed !important;
+          bottom: 15px !important;
+          width: 100% !important;
+          left: 0 !important;
+          padding: 0 40px !important;
+          box-sizing: border-box !important;
+          display: flex !important;
+        }
+
+        body {
+          background: white;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="sidebar">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <h3>BBVA EDITOR</h3>
+        <a
+          href="index.html"
+          style="color: #00aaff; text-decoration: none; font-size: 11px"
+          >← VOLVER</a
+        >
+      </div>
+      <button
+        onclick="window.print()"
+        style="
+          width: 100%;
+          padding: 10px;
+          background: #00aaff;
+          color: white;
+          border: none;
+          cursor: pointer;
+          font-weight: bold;
+        "
+      >
+        GENERAR PDF
+      </button>
+      <button
+        onclick="limpiar()"
+        style="
+          width: 100%;
+          margin-top: 5px;
+          padding: 5px;
+          background: #444;
+          color: white;
+          border: none;
+          cursor: pointer;
+          font-size: 10px;
+        "
+      >
+        LIMPIAR DATOS
+      </button>
+      <button
+        onclick="
+          generarDatosRandom();
+          up();
+        "
+        style="
+          width: 100%;
+          margin-top: 5px;
+          padding: 5px;
+          background: #ff9900;
+          color: white;
+          border: none;
+          cursor: pointer;
+          font-size: 10px;
+          font-weight: bold;
+        "
+      >
+        GENERAR FOLIOS RANDOM
+      </button>
+
+      <div class="form-section">
+        <h3>Encabezado y Cliente</h3>
+        <div class="form-group">
+          <label>Titular Principal</label>
+          <div style="display: flex; gap: 5px">
+            <select
+              id="inTit"
+              onchange="
+                autocompletarTitular();
+                up();
+              "
+              style="width: 100%"
+            >
+              <option value="" selected>-- Selecciona un Titular --</option>
+            </select>
+            <button
+              onclick="cargarParaEditarTitular()"
+              style="
+                background: #ff9900;
+                color: white;
+                border: none;
+                border-radius: 2px;
+                cursor: pointer;
+                font-size: 10px;
+                padding: 0 8px;
+                font-weight: bold;
+              "
+            >
+              EDITAR
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Fecha y Hora (Ej: 16/02/2026 13:52:05 PM)</label
+          ><input type="text" id="inFecH" value="" readonly oninput="up()" />
+        </div>
+        <div class="form-group" style="display: none">
+          <label>Fecha y Hora</label
+          ><input type="text" id="inFec" value="" readonly oninput="up()" />
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-group">
+          <label>Beneficiario</label>
+          <div style="display: flex; gap: 5px">
+            <select
+              id="inBen"
+              onchange="
+                autocompletarBeneficiario();
+                up();
+              "
+              style="width: 100%"
+            >
+              <option value="" selected>
+                -- Selecciona un Beneficiario --
+              </option>
+            </select>
+            <button
+              onclick="cargarParaEditarBeneficiario()"
+              style="
+                background: #ff9900;
+                color: white;
+                border: none;
+                border-radius: 2px;
+                cursor: pointer;
+                font-size: 10px;
+                padding: 0 8px;
+                font-weight: bold;
+              "
+            >
+              EDITAR
+            </button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Cuenta Depósito</label
+            ><input type="text" id="inCtaD" value="" oninput="up()" />
+          </div>
+          <div class="form-group">
+            <label>País</label
+            ><input type="text" id="inPaiBen" value="" oninput="up()" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Estado/Provincia</label
+            ><input type="text" id="inEst" value="" oninput="up()" />
+          </div>
+          <div class="form-group">
+            <label>Ciudad/Alcaldía</label
+            ><input type="text" id="inCiu" value="" oninput="up()" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Calle</label
+            ><input type="text" id="inCal" value="" oninput="up()" />
+          </div>
+          <div class="form-group">
+            <label>Num Exterior</label
+            ><input type="text" id="inNumE" value="" oninput="up()" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Código Postal</label
+            ><input type="text" id="inCP" value="" oninput="up()" />
+          </div>
+          <div class="form-group">
+            <label>Banco</label>
+            <select
+              id="inBan"
+              onchange="
+                autocompletarBancoDestino();
+                up();
+              "
+            >
+              <option value="">-- Selecciona un Beneficiario primero --</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Banco Destino</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>SWIFT/BIC</label
+            ><input type="text" id="inSwi" value="" oninput="up()" />
+          </div>
+          <div class="form-group">
+            <label>País</label
+            ><input type="text" id="inPaiB" value="" oninput="up()" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Banco Destino</label
+          ><input type="text" id="inBanD" value="" oninput="up()" />
+        </div>
+        <div class="form-group">
+          <label>Dirección Banco</label
+          ><input type="text" id="inDirB" value="" oninput="up()" />
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Operación y Folios</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Cuenta Retiro</label
+            ><input type="text" id="inCtaR" value="" oninput="up()" />
+          </div>
+          <div class="form-group">
+            <label>Importe a Cargar</label
+            ><input type="text" id="inImpC" value="$10,000.00" oninput="up()" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Monto Divisa Enviar</label
+          ><input
+            type="text"
+            id="inMonE"
+            value="$10,000.00"
+            oninput="up()"
+            readonly
+          />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Folio Operación</label
+            ><input type="text" id="inFolO" value="" oninput="up()" />
+          </div>
+          <div class="form-group">
+            <label>Folio Cambiario</label
+            ><input type="text" id="inFolC" value="" oninput="up()" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>UETR</label
+          ><input type="text" id="inUet" value="" oninput="up()" />
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div id="preview">
+        <div class="top-info">
+          <div class="op-date outFecH" style="margin-left: 20px">---</div>
+          <div class="top-title">Transferencias Internacionales</div>
+        </div>
+        <div class="sheet">
+          <div class="bbva-header">
+            <div class="logo-bbva">
+              <img src="BBVA_logo.svg.png" alt="BBVA" />
+            </div>
+          </div>
+
+          <div class="client-header">
+            <div class="op-date outFec">---</div>
+            <div id="comprobante">COMPROBANTE</div>
+            <div id="texto">
+              Mis operaciones frecuentes - Realizar una operación -
+              Transferencias Internacionales
+            </div>
+            <div id="outTit" class="client-name" style="padding-bottom: 5px">
+              ---
+            </div>
+            <div class="op-date outFecH">---</div>
+          </div>
+
+          <div class="section-header">Resultado de la transferencia</div>
+          <div class="data-row">
+            <div class="data-label">Tipo de operación</div>
+            <div class="data-value">TRANSFERENCIA INTERNACIONAL</div>
+          </div>
+
+          <div class="section-header">Datos del banco destino</div>
+          <div class="data-row">
+            <div class="data-label">Código SWIFT/BIC</div>
+            <div id="outSwi" class="data-value">---</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Banco Destino</div>
+            <div id="outBanD" class="data-value">---</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Dirección</div>
+            <div id="outDirB" class="data-value">---</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">País</div>
+            <div id="outPaiB" class="data-value">---</div>
+          </div>
+
+          <div class="section-header">Datos del beneficiario</div>
+          <div class="data-row">
+            <div class="data-label">Cuenta de depósito</div>
+            <div id="outCtaD" class="data-value">---</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Nombre de Beneficiario</div>
+            <div id="outBen" class="data-value">---</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">País</div>
+            <div id="outPaiBen" class="data-value">---</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Estado o provincia</div>
+            <div id="outEst" class="data-value">---</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Ciudad, municipio o alcaldía</div>
+            <div id="outCiu" class="data-value">---</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Código postal</div>
+            <div id="outCP" class="data-value">---</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Calle</div>
+            <div id="outCal" class="data-value">---</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Número exterior</div>
+            <div id="outNumE" class="data-value">---</div>
+          </div>
+
+          <div class="section-header">Datos de la operación</div>
+          <div class="data-row">
+            <div class="data-label">Cuenta de retiro</div>
+            <div id="outCtaR" class="data-value">---</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Nombre del titular</div>
+            <div id="outTit2" class="data-value">---</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Importe a cargar a la cuenta</div>
+            <div class="data-value dinero">
+              <span id="outImpC">0.00</span> USD
+            </div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Importe de la divisa a enviar</div>
+            <div class="data-value dinero">
+              <span id="outMonE">0.00</span> USD
+            </div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Folio de operación</div>
+            <div id="outFolO" class="data-value">---</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Folio de operación cambiaria</div>
+            <div id="outFolC" class="data-value">---</div>
+          </div>
+          <div class="data-row">
+            <div class="data-label">Referencia Única (UETR)</div>
+            <div id="outUet" class="data-value">---</div>
+          </div>
+
+          <div class="footer-text">
+            La comisión por operación será aplicada el fin de mes y dependerá de
+            la tarifa contratada para su servicio de banca en Línea.
+          </div>
+
+          <div class="legal-footer">
+            BBVA MÉXICO S.A., INSTITUCIÓN DE BANCA MÚLTIPLE, GRUPO FINANCIERO
+            BBVA MÉXICO
+          </div>
+          <div class="btn-wrapper">
+            <button class="banregio-btn" onclick="window.close()">
+              Cerrar
+            </button>
+            <button class="banregio-btn" onclick="window.print()">
+              Imprimir
+            </button>
+          </div>
+        </div>
+        <div class="url-footer-global">
+          <span class="url-left">
+            https://empresas.bbvanet.com.mx/mexiconet2/mexiconet2/OperacionCBTFServlet?proceso=transferencias_internacionales_pr&operacion=transferen…
+          </span>
+          <span class="url-right">1/1</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="right-panel">
+      <div class="panel-card">
+        <h3>+ Agregar Nuevo Titular</h3>
+        <div class="form-group">
+          <label>Nombre del Titular:</label>
+          <input
+            type="text"
+            id="modNomTit"
+            placeholder="Ej. EMPRESA SA DE CV"
+          />
+        </div>
+        <div class="form-group">
+          <label>Cuenta de Retiro:</label>
+          <input type="text" id="modCtaTit" placeholder="Ej. 12443178901" />
+        </div>
+        <button
+          class="btn-guardar"
+          id="btnGuardarModal"
+          onclick="guardarTitularPanel()"
+          style="width: 100%; margin-top: 10px"
+        >
+          Guardar Titular
+        </button>
+      </div>
+
+      <div class="panel-card">
+        <h3>+ Agregar Nuevo Beneficiario</h3>
+        <div class="form-group">
+          <label>Beneficiario:</label><input type="text" id="modNomBen" />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+          <div class="form-group">
+            <label>Cuenta Depósito:</label><input type="text" id="modCtaBen" />
+          </div>
+          <div class="form-group">
+            <label>País:</label><input type="text" id="modPaiBen" />
+          </div>
+          <div class="form-group">
+            <label>Estado/Provincia:</label><input type="text" id="modEstBen" />
+          </div>
+          <div class="form-group">
+            <label>Ciudad/Alcaldía:</label><input type="text" id="modCiuBen" />
+          </div>
+          <div class="form-group">
+            <label>Calle:</label><input type="text" id="modCalBen" />
+          </div>
+          <div class="form-group">
+            <label>Num Exterior:</label><input type="text" id="modNumBen" />
+          </div>
+          <div class="form-group">
+            <label>Código Postal:</label><input type="text" id="modCPBen" />
+          </div>
+        </div>
+
+        <h4
+          style="
+            color: #1863bc;
+            border-bottom: 1px solid #ccc;
+            margin-top: 15px;
+            padding-bottom: 5px;
+            font-size: 12px;
+          "
+        >
+          Bancos Asociados
+        </h4>
+
+        <div
+          style="
+            background: #f1f5fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #e0e5eb;
+          "
+        >
+          <div class="form-group">
+            <label>Banco Destino:</label
+            ><input
+              type="text"
+              id="modBanNom"
+              placeholder="Ej. BANK OF CHINA"
+            />
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+            <div class="form-group">
+              <label>SWIFT/BIC:</label><input type="text" id="modBanSwi" />
+            </div>
+            <div class="form-group">
+              <label>País Banco:</label><input type="text" id="modBanPai" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Dirección Banco:</label><input type="text" id="modBanDir" />
+          </div>
+
+          <button
+            onclick="agregarBancoTemporal()"
+            style="
+              margin-top: 5px;
+              width: 100%;
+              padding: 6px;
+              background: #00a0df;
+              color: white;
+              border: none;
+              border-radius: 3px;
+              cursor: pointer;
+              font-size: 11px;
+              font-weight: bold;
+            "
+          >
+            + Añadir banco a la lista
+          </button>
+        </div>
+
+        <ul
+          id="listaBancosTemporales"
+          style="
+            font-size: 11px;
+            padding-left: 20px;
+            color: #444;
+            min-height: 20px;
+            margin-bottom: 15px;
+          "
+        >
+          <li><i>Aún no hay bancos en la lista...</i></li>
+        </ul>
+
+        <button
+          class="btn-guardar"
+          id="btnGuardarBen"
+          onclick="guardarBeneficiarioPanel()"
+          style="width: 100%"
+        >
+          Guardar Beneficiario
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // URL DE GOOGLE
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbydqyZ8opyE9-NXuSJvHv2cBzruNLtAN4g4UtXCKBDRZgf1SKgz71XUAjDmP2qIxSeP/exec";
+
+      let baseDatosTitulares = {};
+      let baseDatosBeneficiarios = {};
+
+      //LECTURA DESDE GOOGLE SHEETS
+      async function cargarDatosDesdeSheets() {
+        const selectTitular = document.getElementById("inTit");
+        const selectBeneficiario = document.getElementById("inBen");
+
+        selectTitular.innerHTML = '<option value="">Cargando datos...</option>';
+        selectBeneficiario.innerHTML =
+          '<option value="">Cargando datos...</option>';
+
+        try {
+          const respuesta = await fetch(API_URL);
+          const datos = await respuesta.json();
+
+          baseDatosTitulares = datos.titulares || {};
+          baseDatosBeneficiarios = datos.beneficiarios || {};
+
+          cargarSelectTitulares();
+          cargarSelectBeneficiarios();
+        } catch (error) {
+          console.error("Error leyendo Google Sheets:", error);
+          selectTitular.innerHTML = '<option value="">Error de carga</option>';
+          selectBeneficiario.innerHTML =
+            '<option value="">Error de carga</option>';
+        }
+      }
+
+      //DIBUJAR LOS MENÚS DESPLEGABLES
+      function cargarSelectTitulares() {
+        const selectTitular = document.getElementById("inTit");
+        selectTitular.innerHTML =
+          '<option value="" selected>-- Selecciona un Titular --</option>';
+
+        for (const nombreTitular in baseDatosTitulares) {
+          const option = document.createElement("option");
+          option.value = nombreTitular;
+          option.text = nombreTitular;
+          selectTitular.appendChild(option);
+        }
+      }
+
+      function cargarSelectBeneficiarios() {
+        const selectBen = document.getElementById("inBen");
+        selectBen.innerHTML =
+          '<option value="" selected>-- Selecciona un Beneficiario --</option>';
+
+        for (const nombreBen in baseDatosBeneficiarios) {
+          const option = document.createElement("option");
+          option.value = nombreBen;
+          option.text = nombreBen;
+          selectBen.appendChild(option);
+        }
+      }
+
+      //CARGAR PARA EDITAR
+      function cargarParaEditarTitular() {
+        const nombre = document.getElementById("inTit").value;
+        if (!nombre) {
+          alert("Selecciona un titular de la lista primero.");
+          return;
+        }
+        const datos = baseDatosTitulares[nombre];
+        document.getElementById("modNomTit").value = nombre;
+        document.getElementById("modCtaTit").value = datos.cuentaRetiro || "";
+      }
+
+      function cargarParaEditarBeneficiario() {
+        const nombre = document.getElementById("inBen").value;
+        if (!nombre) {
+          alert("Selecciona un beneficiario de la lista primero.");
+          return;
+        }
+        const datos = baseDatosBeneficiarios[nombre];
+        document.getElementById("modNomBen").value = nombre;
+        document.getElementById("modCtaBen").value = datos.cuentaDeposito || "";
+        document.getElementById("modPaiBen").value = datos.pais || "";
+        document.getElementById("modEstBen").value = datos.estado || "";
+        document.getElementById("modCiuBen").value = datos.ciudad || "";
+        document.getElementById("modCPBen").value = datos.codigoPostal || "";
+        document.getElementById("modCalBen").value = datos.calle || "";
+        document.getElementById("modNumBen").value = datos.numExterior || "";
+
+        bancosTemporales = datos.bancos
+          ? JSON.parse(JSON.stringify(datos.bancos))
+          : [];
+        actualizarListaBancos();
+      }
+
+      //GUARDADO DIRECTO DESDE EL PANEL (TITULAR)
+      async function guardarTitularPanel() {
+        const nuevoNombre = document.getElementById("modNomTit").value.trim();
+        const nuevaCuenta = document.getElementById("modCtaTit").value.trim();
+
+        if (!nuevoNombre || !nuevaCuenta) {
+          alert("Por favor llena ambos campos del titular.");
+          return;
+        }
+
+        const nombreMayusculas = nuevoNombre.toUpperCase();
+
+        if (baseDatosTitulares[nombreMayusculas]) {
+          const confirmar = confirm(
+            "⚠️ Este titular ya existe. ¿Deseas actualizar/sobreescribir sus datos?",
+          );
+          if (!confirmar) return;
+        }
+
+        const btnGuardar = document.getElementById("btnGuardarModal");
+        btnGuardar.innerText = "Guardando...";
+        btnGuardar.disabled = true;
+
+        baseDatosTitulares[nombreMayusculas] = { cuentaRetiro: nuevaCuenta };
+        cargarSelectTitulares();
+
+        try {
+          await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              tipo: "titular",
+              nombre: nombreMayusculas,
+              cuentaRetiro: nuevaCuenta,
+            }),
+          });
+
+          document.getElementById("modNomTit").value = "";
+          document.getElementById("modCtaTit").value = "";
+          alert("¡Titular guardado/actualizado exitosamente!");
+        } catch (error) {
+          console.error("Error al guardar:", error);
+          alert("Se guardó temporalmente, pero hubo un error de red.");
+        } finally {
+          btnGuardar.innerText = "Guardar Titular";
+          btnGuardar.disabled = false;
+        }
+      }
+
+      //GUARDADO DIRECTO DESDE EL PANEL (BENEFICIARIO)
+      let bancosTemporales = [];
+
+      function agregarBancoTemporal() {
+        const nom = document
+          .getElementById("modBanNom")
+          .value.trim()
+          .toUpperCase();
+        const swi = document
+          .getElementById("modBanSwi")
+          .value.trim()
+          .toUpperCase();
+        const pai = document
+          .getElementById("modBanPai")
+          .value.trim()
+          .toUpperCase();
+        const dir = document
+          .getElementById("modBanDir")
+          .value.trim()
+          .toUpperCase();
+
+        if (!nom || !swi) {
+          alert("Mínimo necesitas escribir el Nombre y SWIFT del banco.");
+          return;
+        }
+
+        bancosTemporales.push({
+          nombre: nom,
+          swift: swi,
+          pais: pai,
+          direccion: dir,
+        });
+
+        document.getElementById("modBanNom").value = "";
+        document.getElementById("modBanSwi").value = "";
+        document.getElementById("modBanPai").value = "";
+        document.getElementById("modBanDir").value = "";
+
+        actualizarListaBancos();
+      }
+
+      function actualizarListaBancos() {
+        const ul = document.getElementById("listaBancosTemporales");
+        ul.innerHTML = "";
+
+        if (bancosTemporales.length === 0) {
+          ul.innerHTML = "<li><i>Aún no hay bancos en la lista...</i></li>";
+          return;
+        }
+
+        bancosTemporales.forEach((banco, index) => {
+          ul.innerHTML += `<li style="margin-bottom: 4px;">
+                    <b>${banco.nombre}</b> (SWIFT: ${banco.swift}) 
+                    <span style="color:red; cursor:pointer; margin-left:10px; font-weight:bold;" onclick="quitarBancoTemporal(${index})">[X] borrar</span>
+                </li>`;
+        });
+      }
+
+      function quitarBancoTemporal(index) {
+        bancosTemporales.splice(index, 1);
+        actualizarListaBancos();
+      }
+
+      async function guardarBeneficiarioPanel() {
+        const nombre = document
+          .getElementById("modNomBen")
+          .value.trim()
+          .toUpperCase();
+
+        if (!nombre) {
+          alert("El nombre del beneficiario es obligatorio.");
+          return;
+        }
+
+        if (baseDatosBeneficiarios[nombre]) {
+          const confirmar = confirm(
+            "⚠️ Este beneficiario ya existe. ¿Deseas actualizar/sobreescribir sus datos y sus bancos?",
+          );
+          if (!confirmar) return;
+        }
+
+        if (bancosTemporales.length === 0) {
+          alert("Debes agregar al menos un banco a la lista antes de guardar.");
+          return;
+        }
+
+        const btnGuardar = document.getElementById("btnGuardarBen");
+        btnGuardar.innerText = "Guardando...";
+        btnGuardar.disabled = true;
+
+        const paquete = {
+          tipo: "beneficiario",
+          nombre: nombre,
+          cuentaDeposito: document.getElementById("modCtaBen").value.trim(),
+          pais: document.getElementById("modPaiBen").value.trim().toUpperCase(),
+          estado: document
+            .getElementById("modEstBen")
+            .value.trim()
+            .toUpperCase(),
+          ciudad: document
+            .getElementById("modCiuBen")
+            .value.trim()
+            .toUpperCase(),
+          codigoPostal: document.getElementById("modCPBen").value.trim(),
+          calle: document
+            .getElementById("modCalBen")
+            .value.trim()
+            .toUpperCase(),
+          numExterior: document.getElementById("modNumBen").value.trim(),
+          bancos: bancosTemporales,
+        };
+
+        baseDatosBeneficiarios[nombre] = paquete;
+        cargarSelectBeneficiarios();
+
+        try {
+          await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(paquete),
+          });
+
+          document
+            .querySelectorAll("#right-panel input")
+            .forEach((i) => (i.value = ""));
+          bancosTemporales = [];
+          actualizarListaBancos();
+          alert("¡Beneficiario guardado/actualizado exitosamente!");
+        } catch (error) {
+          console.error("Error al guardar:", error);
+          alert("Hubo un error de red al subirlo a la nube.");
+        } finally {
+          btnGuardar.innerText = "Guardar Beneficiario";
+          btnGuardar.disabled = false;
+        }
+      }
+
+      //LOGICA DE AUTOCOMPLETADO
+      function autocompletarTitular() {
+        const titularSeleccionado = document.getElementById("inTit").value;
+        const datos = baseDatosTitulares[titularSeleccionado];
+
+        if (datos) {
+          document.getElementById("inCtaR").value = datos.cuentaRetiro || "";
+        } else {
+          document.getElementById("inCtaR").value = "";
+        }
+      }
+
+      function autocompletarBeneficiario() {
+        const beneficiarioSeleccionado = document.getElementById("inBen").value;
+        const datos = baseDatosBeneficiarios[beneficiarioSeleccionado];
+        const selectBanco = document.getElementById("inBan");
+
+        selectBanco.innerHTML = "";
+
+        if (datos) {
+          document.getElementById("inCtaD").value = datos.cuentaDeposito || "";
+          document.getElementById("inPaiBen").value = datos.pais || "";
+          document.getElementById("inEst").value = datos.estado || "";
+          document.getElementById("inCiu").value = datos.ciudad || "";
+          document.getElementById("inCal").value = datos.calle || "";
+          document.getElementById("inNumE").value = datos.numExterior || "";
+          document.getElementById("inCP").value = datos.codigoPostal || "";
+
+          if (datos.bancos && datos.bancos.length > 0) {
+            datos.bancos.forEach((banco, index) => {
+              const option = document.createElement("option");
+              option.value = index;
+              option.text = banco.nombre;
+              selectBanco.appendChild(option);
+            });
+          } else {
+            const option = document.createElement("option");
+            option.value = "";
+            option.text = "-- Sin banco registrado --";
+            selectBanco.appendChild(option);
+          }
+        } else {
+          document.querySelectorAll("#sidebar input").forEach((input) => {
+            if (
+              input.id !== "inTit" &&
+              input.id !== "inCtaR" &&
+              input.id !== "inFecH" &&
+              input.id !== "inFec" &&
+              input.id !== "inImpC" &&
+              input.id !== "inMonE" &&
+              input.id !== "inFolO" &&
+              input.id !== "inFolC" &&
+              input.id !== "inUet"
+            ) {
+              input.value = "";
+            }
+          });
+
+          const option = document.createElement("option");
+          option.value = "";
+          option.text = "-- Selecciona un Beneficiario --";
+          selectBanco.appendChild(option);
+        }
+
+        autocompletarBancoDestino();
+      }
+
+      function autocompletarBancoDestino() {
+        const beneficiarioSeleccionado = document.getElementById("inBen").value;
+        const indiceBanco = document.getElementById("inBan").value;
+
+        if (beneficiarioSeleccionado && indiceBanco !== "") {
+          const bancoDatos =
+            baseDatosBeneficiarios[beneficiarioSeleccionado].bancos[
+              indiceBanco
+            ];
+
+          if (bancoDatos) {
+            document.getElementById("inBanD").value = bancoDatos.nombre || "";
+            document.getElementById("inSwi").value = bancoDatos.swift || "";
+            document.getElementById("inPaiB").value = bancoDatos.pais || "";
+            document.getElementById("inDirB").value =
+              bancoDatos.direccion || "";
+            return;
+          }
+        }
+
+        document.getElementById("inBanD").value = "";
+        document.getElementById("inSwi").value = "";
+        document.getElementById("inPaiB").value = "";
+        document.getElementById("inDirB").value = "";
+      }
+
+      //FUNCIONES DE FECHA, FOLIOS Y RENDERIZADO VISUAL
+      function generarDatosRandom() {
+        const folioO = Math.floor(1000000000 + Math.random() * 9000000000);
+        document.getElementById("inFolO").value = folioO;
+
+        const folioC = Math.floor(10000000 + Math.random() * 90000000);
+        document.getElementById("inFolC").value = folioC;
+
+        const uetr = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+          /[xy]/g,
+          function (c) {
+            const r = (Math.random() * 16) | 0;
+            const v = c === "x" ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+          },
+        );
+        document.getElementById("inUet").value = uetr;
+      }
+
+      function up() {
+        document.getElementById("inMonE").value =
+          document.getElementById("inImpC").value;
+        const map = {
+          inTit: "outTit",
+          inFec: "outFec",
+          inFecH: "outFecH",
+          inSwi: "outSwi",
+          inBanD: "outBanD",
+          inDirB: "outDirB",
+          inPaiB: "outPaiB",
+          inCtaD: "outCtaD",
+          inBen: "outBen",
+          inPaiBen: "outPaiBen",
+          inEst: "outEst",
+          inCiu: "outCiu",
+          inCP: "outCP",
+          inCal: "outCal",
+          inNumE: "outNumE",
+          inCtaR: "outCtaR",
+          inImpC: "outImpC",
+          inMonE: "outMonE",
+          inFolO: "outFolO",
+          inFolC: "outFolC",
+          inUet: "outUet",
+        };
+
+        for (let inputId in map) {
+          const outName = map[inputId];
+          const inEl = document.getElementById(inputId);
+          if (!inEl) continue;
+          const val = inEl.value;
+          const outById = document.getElementById(outName);
+          if (outById) {
+            outById.innerText = val;
+          } else {
+            document
+              .querySelectorAll("." + outName)
+              .forEach((el) => (el.innerText = val));
+          }
+        }
+        document.getElementById("outTit2").innerText =
+          document.getElementById("inTit").value;
+      }
+
+      function autocompletarFechas_hora() {
+        const pad = (n) => n.toString().padStart(2, "0");
+        const now = new Date();
+        const fecha = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+        const hora = pad(now.getHours());
+        const mins = pad(now.getMinutes());
+        const secs = pad(now.getSeconds());
+        const ampm = now.getHours() >= 12 ? "PM" : "AM";
+        const fechaHora = `${fecha} ${hora}:${mins}:${secs} ${ampm}`;
+        const inFecH = document.getElementById("inFecH");
+        if (inFecH) inFecH.value = fechaHora;
+      }
+
+      function autocompletarFechas() {
+        const pad = (n) => n.toString().padStart(2, "0");
+        const now = new Date();
+        const fecha = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+        const inFec = document.getElementById("inFec");
+        if (inFec) inFec.value = fecha;
+      }
+
+      function limpiar() {
+        if (confirm("¿Limpiar todo?")) {
+          document
+            .querySelectorAll("#sidebar input")
+            .forEach((i) => (i.value = ""));
+          document.getElementById("inTit").value = "";
+          document.getElementById("inBen").value = "";
+          autocompletarBeneficiario(); // Para limpiar los bancos
+          up();
+        }
+      }
+
+      //INICIALIZACIÓN AL ABRIR LA PÁGINA
+      cargarDatosDesdeSheets();
+      autocompletarFechas_hora();
+      autocompletarFechas();
+      generarDatosRandom();
+      up();
+    </script>
+  </body>
+</html>

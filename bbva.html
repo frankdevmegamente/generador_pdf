@@ -1526,7 +1526,7 @@
         if (inFec) inFec.value = fecha;
       }
 
-      function autocompletarFechaSuperior() {
+    function autocompletarFechaSuperior() {
     const now = new Date();
     
     // Obtener día, mes y año a dos dígitos
@@ -1534,16 +1534,12 @@
     const mes = now.getMonth() + 1;
     const anio = now.getFullYear().toString().slice(-2); 
     
-    // Configurar horas, minutos y a.m./p.m.
-    let horas = now.getHours();
+    // Configurar horas (24h) y minutos, asegurando que tengan dos dígitos (ej. 08:05)
+    const horas = now.getHours().toString().padStart(2, "0");
     const minutos = now.getMinutes().toString().padStart(2, "0");
-    const ampm = horas >= 12 ? "p.m." : "a.m.";
     
-    horas = horas % 12;
-    horas = horas ? horas : 12; // Convierte la hora '0' a '12'
-    
-    // Ensamblar la fecha en el formato deseado
-    const fechaFormateada = `${dia}/${mes}/${anio}, ${horas}:${minutos} ${ampm}`;
+    // Ensamblar la fecha en el formato de 24 horas (ej. 11/3/26, 16:32)
+    const fechaFormateada = `${dia}/${mes}/${anio}, ${horas}:${minutos}`;
     
     // Buscar el elemento con la nueva clase y aplicarle el texto (conservando el &nbsp; original)
     document.querySelectorAll(".outFecSup").forEach(el => {

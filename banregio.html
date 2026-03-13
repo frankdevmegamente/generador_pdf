@@ -251,10 +251,10 @@
         }
 
         #preview {
-          margin: 0 !important; /* <-- Esto elimina los márgenes laterales que aplastaban el texto */
+          margin: 0 !important;
           width: 100% !important;
-          height: 100vh !important; /* Fuerza el alto a exactamente una sola hoja */
-          padding: 12mm 15mm !important; /* Crea los márgenes blancos de impresión */
+          height: 100vh !important;
+          padding: 12mm 15mm !important;
           box-sizing: border-box !important;
           display: block !important;
           position: relative !important;
@@ -266,7 +266,7 @@
         }
 
         .page-footer {
-          position: absolute !important; /* Fija el footer en la parte inferior de la primera hoja */
+          position: absolute !important;
           bottom: 12mm !important;
           left: 15mm !important;
           right: 15mm !important;
@@ -485,8 +485,16 @@
           ><input type="text" id="inCtaB" value="" oninput="up()" />
         </div>
         <div class="form-group">
-          <label>Banco/ABA/Plaza</label
-          ><input type="text" id="inBanA" value="" oninput="up()" />
+          <label>Banco Beneficiario</label>
+          <input type="text" id="inBanA" value="" oninput="up()" />
+        </div>
+        <div class="form-group">
+          <label>ABA</label>
+          <input type="text" id="inABA" value="" oninput="up()" />
+        </div>
+        <div class="form-group">
+          <label>Plaza/Ciudad</label>
+          <input type="text" id="inPlaza" value="" oninput="up()" />
         </div>
       </div>
 
@@ -564,19 +572,24 @@
       <div class="panel-card">
         <h3>+ Guardar/Editar Beneficiario (Destino)</h3>
         <div class="form-group">
-          <label>Nombre Beneficiario:</label
-          ><input type="text" id="modNomBen" />
+          <label>Nombre Beneficiario:</label>
+          <input type="text" id="modNomBen" />
         </div>
         <div class="form-group">
-          <label>Cuenta:</label><input type="text" id="modCtaBen" />
+          <label>Cuenta:</label>
+          <input type="text" id="modCtaBen" />
         </div>
         <div class="form-group">
-          <label>Banco / ABA / Plaza:</label
-          ><input
-            type="text"
-            id="modBanAba"
-            placeholder="Ej. TRUIST BANK / ABA: 111017694 / TEXAS"
-          />
+          <label>Banco:</label>
+          <input type="text" id="modBanAba" placeholder="Ej. TRUIST BANK" />
+        </div>
+        <div class="form-group">
+          <label>ABA:</label>
+          <input type="text" id="modAbaBen" placeholder="Ej. 111017694" />
+        </div>
+        <div class="form-group">
+          <label>Plaza:</label>
+          <input type="text" id="modPlazaBen" placeholder="Ej. TEXAS" />
         </div>
         <button
           class="btn-guardar"
@@ -780,7 +793,7 @@
 
     <script>
       const API_URL =
-        "https://script.google.com/macros/s/AKfycbzG5C5hrmg9IsyXQhX1H_qLjK2sdaURcGy6qdauymKZVTtQ9NexBVOPBnJMy5Syd7UT/exec";
+        "https://script.google.com/macros/s/AKfycbzG5C5hrmg9IsyXQhX1H_qLjK2sdaURcGy6qdauymKZVTtQ9NexBVOPBnJMy5Syd7UT/exec"; // ACTUALIZA LA URL AQUÍ LUEGO DE GENERAR LA NUEVA IMPLEMENTACIÓN
 
       let dbTitularesBR = {};
       let dbBeneficiariosBR = {};
@@ -849,9 +862,9 @@
         const datos = dbBeneficiariosBR[nomSelec];
         document.getElementById("inBen").value = datos ? nomSelec : "";
         document.getElementById("inCtaB").value = datos ? datos.cuenta : "";
-        document.getElementById("inBanA").value = datos
-          ? datos.bancoAbaPlaza
-          : "";
+        document.getElementById("inBanA").value = datos ? datos.banco : "";
+        document.getElementById("inABA").value = datos ? datos.aba : "";
+        document.getElementById("inPlaza").value = datos ? datos.plaza : "";
       }
 
       function cargarParaEditarTitular() {
@@ -879,7 +892,9 @@
         const datos = dbBeneficiariosBR[nombre];
         document.getElementById("modNomBen").value = nombre;
         document.getElementById("modCtaBen").value = datos.cuenta;
-        document.getElementById("modBanAba").value = datos.bancoAbaPlaza;
+        document.getElementById("modBanAba").value = datos.banco;
+        document.getElementById("modAbaBen").value = datos.aba;
+        document.getElementById("modPlazaBen").value = datos.plaza;
         beneficiarioOriginalBR = nombre;
       }
 
@@ -929,15 +944,14 @@
         cargarSelects();
 
         try {
-          // AQUÍ QUITAMOS EL NO-CORS Y LEIMOS LA RESPUESTA DE GOOGLE
           const respuesta = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify(paquete),
           });
 
-          const resultado = await respuesta.json(); // Leemos la nube
-          alert("Cliente guardado con exito!: " + resultado.status); // Detector de errores activado
+          const resultado = await respuesta.json();
+          alert("Cliente guardado con exito!: " + resultado.status);
 
           document
             .querySelectorAll("#right-panel input")
@@ -976,8 +990,13 @@
           originalId: beneficiarioOriginalBR,
           idUnico: nombre,
           cuenta: document.getElementById("modCtaBen").value.trim(),
-          bancoAbaPlaza: document
+          banco: document
             .getElementById("modBanAba")
+            .value.trim()
+            .toUpperCase(),
+          aba: document.getElementById("modAbaBen").value.trim().toUpperCase(),
+          plaza: document
+            .getElementById("modPlazaBen")
             .value.trim()
             .toUpperCase(),
         };
@@ -988,15 +1007,14 @@
         cargarSelects();
 
         try {
-          // AQUÍ QUITAMOS EL NO-CORS Y LEIMOS LA RESPUESTA DE GOOGLE
           const respuesta = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify(paquete),
           });
 
-          const resultado = await respuesta.json(); // Leemos la nube
-          alert("Beneficiario guardado con exito!: " + resultado.status); // Detector de errores activado
+          const resultado = await respuesta.json();
+          alert("Beneficiario guardado con exito!: " + resultado.status);
 
           document
             .querySelectorAll("#right-panel input")
@@ -1033,11 +1051,14 @@
           inCtaB: "outCtaB",
           inMonMXN: "outMonMXN",
           inCtaC: "outCtaC",
+          inBanA: "outBanA",
+          inABA: "outABA",
+          inPlaza: "outPlaza",
         };
         for (let i in map) {
           let val = document.getElementById(i).value;
           let el = document.getElementById(map[i]);
-          if (el) el.innerText = val;
+          if (el) el.innerText = val || "---";
           if (i === "inMonUSD") {
             let tdEl = document.getElementById("outTotalUSD");
             if (tdEl) tdEl.innerText = val;
@@ -1057,31 +1078,7 @@
           document.getElementById("outMonMXN").innerText = formattedMXN;
           document.getElementById("outTotalMXN").innerText = formattedMXN;
         }
-        const banRaw = document.getElementById("inBanA").value || "";
-        const parts = banRaw
-          .split("/")
-          .map((p) => p.trim())
-          .filter((p) => p.length > 0);
-        const bankPart = parts.length > 0 ? parts[0] : "---";
-        let abaPart = parts.find((p) => /\bABA\b/i.test(p));
-        if (abaPart) abaPart = abaPart.replace(/\bABA\b[:\s]*/i, "").trim();
-        else {
-          const maybe = parts.find((p) => /\d{6,}/.test(p));
-          abaPart = maybe ? maybe.trim() : "---";
-        }
-        let plazaPart = parts.find(
-          (p) =>
-            p !== bankPart &&
-            p !== (abaPart === "---" ? "" : `ABA: ${abaPart}`) &&
-            !/\bABA\b/i.test(p),
-        );
-        if (!plazaPart)
-          plazaPart = parts.length > 1 ? parts[parts.length - 1] : "---";
-        document.getElementById("outBanA").innerText = bankPart || "---";
-        document.getElementById("outABA").innerText =
-          abaPart && abaPart !== "---" ? abaPart : "---";
-        document.getElementById("outPlaza").innerText =
-          plazaPart && plazaPart !== "---" ? plazaPart : "---";
+
         const f = document.getElementById("inFecOp").value;
         document
           .querySelectorAll(".outFecOp2")

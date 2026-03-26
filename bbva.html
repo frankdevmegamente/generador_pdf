@@ -1461,26 +1461,22 @@
       }
 
       function formatCurrencyInput(input) {
-        let value = input.value;
-        if (value.endsWith(" USD")) {
-          value = value.slice(0, -4); // remove " USD"
-        }
-        value = value.replace(/[^0-9.]/g, ""); // remove non-numeric except .
-        let parts = value.split(".");
-        if (parts.length > 2) {
-          value = parts[0] + "." + parts.slice(1).join("");
-          parts = value.split(".");
-        }
-        // Limit to 2 decimal places
-        if (parts[1]) {
-          parts[1] = parts[1].substring(0, 2);
-        }
-        // Format with commas
-        if (parts[0]) {
-          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-        input.value = parts.join(".") + " USD";
-      }
+  let value = input.value.replace(/\D/g, ""); // solo números
+
+  if (!value) {
+    input.value = "";
+    return;
+  }
+
+  // Convertir a número con 2 decimales
+  let number = (parseInt(value) / 100).toFixed(2);
+
+  // Separar entero y decimal
+  let parts = number.split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  input.value = parts.join(".");
+}
 
       function up() {
         document.getElementById("inMonE").value =
@@ -1513,7 +1509,8 @@
           const outName = map[inputId];
           const inEl = document.getElementById(inputId);
           if (!inEl) continue;
-          const val = inEl.value;
+          let val = inEl.value;
+          if (inputId === "inImpC" || inputId === "inMonE") val += " USD";
           const outById = document.getElementById(outName);
           if (outById) {
             outById.innerText = val;

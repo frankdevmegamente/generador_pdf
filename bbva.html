@@ -1416,24 +1416,29 @@
       }
 
       function autocompletarBancoDestino() {
-        const beneficiarioSeleccionado = document.getElementById("inBen").value;
-        const indiceBanco = document.getElementById("inBan").value;
+    const beneficiarioSeleccionado = document.getElementById('inBen').value;
+    const indiceBanco = document.getElementById('inBan').value;
 
-        if (beneficiarioSeleccionado && indiceBanco !== "") {
-          const bancoDatos =
-            baseDatosBeneficiarios[beneficiarioSeleccionado].bancos[
-              indiceBanco
-            ];
-
-          if (bancoDatos) {
-            document.getElementById("inBanD").value = bancoDatos.nombre || "";
-            document.getElementById("inSwi").value = bancoDatos.swift || "";
-            document.getElementById("inPaiB").value = bancoDatos.pais || "";
-            document.getElementById("inDirB").value =
-              bancoDatos.direccion || "";
+    if (beneficiarioSeleccionado && indiceBanco !== "") {
+        const bancoDatos = baseDatosBeneficiarios[beneficiarioSeleccionado].bancos[indiceBanco];
+        
+        if (bancoDatos) {
+            document.getElementById('inBanD').value = bancoDatos.nombre || "";
+            document.getElementById('inSwi').value = bancoDatos.swift || "";
+            document.getElementById('inPaiB').value = bancoDatos.pais || "";
+            document.getElementById('inDirB').value = bancoDatos.direccion || "";
+            
+            // --- NUEVO: ALERTA DE PREVENCIÓN ---
+            const paisEmpresa = document.getElementById('inPaiBen').value.trim().toUpperCase();
+            const paisBanco = bancoDatos.pais.trim().toUpperCase();
+            
+            if (paisEmpresa !== "" && paisBanco !== "" && paisEmpresa !== paisBanco) {
+                alert(`⚠️ OJO: Estás mandando dinero a un banco en ${paisBanco}, pero la empresa está registrada en ${paisEmpresa}.\n\nSi es una cuenta Offshore (Ej. Empresa China con banco en Hong Kong) ignora este mensaje. Si es un error, corrígelo con el botón EDITAR.`);
+            }
+            // -----------------------------------
             return;
-          }
         }
+    }
 
         document.getElementById("inBanD").value = "";
         document.getElementById("inSwi").value = "";
@@ -1525,14 +1530,34 @@
       }
 
       function autocompletarFechas_hora() {
-        const pad = (n) => n.toString().padStart(2, "0");
-        const now = new Date();
-        const fecha = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
-        const hora = pad(now.getHours());
-        const mins = pad(now.getMinutes());
-        const secs = pad(now.getSeconds());
-        const ampm = now.getHours() >= 12 ? "PM" : "AM";
-        const fechaHora = `${fecha} ${hora}:${mins}:${secs} ${ampm}`;
+        // Forzamos al sistema a usar la hora oficial del Centro de México
+        const opciones = {
+            timeZone: 'America/Mexico_City',
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            hour12: false // Mantenemos el formato 24h que te pidieron
+        };
+        
+        const formateador = new Intl.DateTimeFormat('es-MX', opciones);
+        const partes = formateador.formatToParts(new Date());
+        
+        let dia = "", mes = "", anio = "", hora = "", mins = "", secs = "";
+        
+        for (let p of partes) {
+            if (p.type === 'day') dia = p.value;
+            if (p.type === 'month') mes = p.value;
+            if (p.type === 'year') anio = p.value;
+            if (p.type === 'hour') hora = p.value;
+            if (p.type === 'minute') mins = p.value;
+            if (p.type === 'second') secs = p.value;
+        }
+        
+        // Calculamos si es AM o PM basado en la hora forzada
+        const ampm = parseInt(hora) >= 12 ? "PM" : "AM";
+        
+        // Armamos el formato exacto: DD/MM/YYYY HH:MM:SS AM/PM
+        const fechaHora = `${dia}/${mes}/${anio} ${hora}:${mins}:${secs} ${ampm}`;
+        
         const inFecH = document.getElementById("inFecH");
         if (inFecH) inFecH.value = fechaHora;
       }
@@ -1546,25 +1571,34 @@
       }
 
     function autocompletarFechaSuperior() {
-    const now = new Date();
-    
-    // Obtener día, mes y año a dos dígitos
-    const dia = now.getDate();
-    const mes = now.getMonth() + 1;
-    const anio = now.getFullYear().toString().slice(-2); 
-    
-    // Configurar horas (24h) y minutos, asegurando que tengan dos dígitos (ej. 08:05)
-    const horas = now.getHours().toString().padStart(2, "0");
-    const minutos = now.getMinutes().toString().padStart(2, "0");
-    
-    // Ensamblar la fecha en el formato de 24 horas (ej. 11/3/26, 16:32)
-    const fechaFormateada = `${dia}/${mes}/${anio}, ${horas}:${minutos}`;
-    
-    // Buscar el elemento con la nueva clase y aplicarle el texto (conservando el &nbsp; original)
-    document.querySelectorAll(".outFecSup").forEach(el => {
-        el.innerHTML = fechaFormateada + " &nbsp;";
-    });
-}
+        // Aplicamos el mismo blindaje de Zona Horaria para la fecha de arriba
+        const opciones = {
+            timeZone: 'America/Mexico_City',
+            year: '2-digit', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit',
+            hour12: false
+        };
+        
+        const formateador = new Intl.DateTimeFormat('es-MX', opciones);
+        const partes = formateador.formatToParts(new Date());
+        
+        let dia = "", mes = "", anio = "", hora = "", mins = "";
+        
+        for (let p of partes) {
+            if (p.type === 'day') dia = p.value;
+            if (p.type === 'month') mes = p.value;
+            if (p.type === 'year') anio = p.value;
+            if (p.type === 'hour') hora = p.value;
+            if (p.type === 'minute') mins = p.value;
+        }
+        
+        // Formato: DD/MM/YY, HH:MM
+        const fechaFormateada = `${dia}/${mes}/${anio}, ${hora}:${mins}`;
+        
+        document.querySelectorAll(".outFecSup").forEach(el => {
+            el.innerHTML = fechaFormateada + " &nbsp;";
+        });
+      }
 
       function limpiar() {
         if (confirm("¿Limpiar todo?")) {

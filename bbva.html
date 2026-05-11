@@ -617,7 +617,7 @@
         >
       </div>
       <button
-        onclick="window.print()"
+        onclick="generatePDF()"
         style="
           width: 100%;
           padding: 10px;
@@ -1611,6 +1611,17 @@
           up();
         }
       }
+
+      function generatePDF() {
+        autocompletarFechas_hora();
+        autocompletarFechaSuperior();
+        setTimeout(() => window.print(), 50);
+      }
+
+      window.addEventListener("beforeprint", function () {
+        autocompletarFechas_hora();
+        autocompletarFechaSuperior();
+      });
 
       //INICIALIZACIÓN AL ABRIR LA PÁGINA
       autocompletarFechaSuperior();

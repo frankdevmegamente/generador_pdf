@@ -1127,22 +1127,44 @@
       function updateFooterClock() {
         const footerEl = document.getElementById("footerTime");
         if (!footerEl) return;
-        const now = new Date();
-        const pad = (n) => n.toString().padStart(2, "0");
-        const hours = pad(now.getHours());
-        const mins = pad(now.getMinutes());
-        const secs = pad(now.getSeconds());
+        const opciones = {
+          timeZone: 'America/Mexico_City',
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+          hour12: false
+        };
+        const formateador = new Intl.DateTimeFormat('es-MX', opciones);
+        const partes = formateador.formatToParts(new Date());
+        let dia = "", mes = "", anio = "", hora = "", mins = "", secs = "";
+        for (let p of partes) {
+          if (p.type === 'day') dia = p.value;
+          if (p.type === 'month') mes = p.value;
+          if (p.type === 'year') anio = p.value;
+          if (p.type === 'hour') hora = p.value;
+          if (p.type === 'minute') mins = p.value;
+          if (p.type === 'second') secs = p.value;
+        }
         const inFec = document.getElementById("inFecOp").value;
         const datePart =
           inFec && inFec.trim()
             ? inFec.trim()
-            : `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
-        footerEl.innerText = `${datePart} ${hours}:${mins}:${secs}`;
+            : `${dia}/${mes}/${anio}`;
+        footerEl.innerText = `${datePart} ${hora}:${mins}:${secs}`;
       }
       function autocompletarFechas() {
-        const pad = (n) => n.toString().padStart(2, "0");
-        const now = new Date();
-        const fechaActual = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+        const opciones = {
+          timeZone: 'America/Mexico_City',
+          year: 'numeric', month: '2-digit', day: '2-digit',
+        };
+        const formateador = new Intl.DateTimeFormat('es-MX', opciones);
+        const partes = formateador.formatToParts(new Date());
+        let dia = "", mes = "", anio = "";
+        for (let p of partes) {
+          if (p.type === 'day') dia = p.value;
+          if (p.type === 'month') mes = p.value;
+          if (p.type === 'year') anio = p.value;
+        }
+        const fechaActual = `${dia}/${mes}/${anio}`;
         const inFecOp = document.getElementById("inFecOp");
         if (inFecOp) inFecOp.value = fechaActual;
       }
@@ -1167,6 +1189,7 @@
       window.addEventListener("beforeprint", handleBeforePrint);
       window.addEventListener("afterprint", handleAfterPrint);
       function generatePDF() {
+        autocompletarFechas();
         try {
           handleBeforePrint();
         } catch (e) {}

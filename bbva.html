@@ -698,8 +698,8 @@
           </div>
         </div>
         <div class="form-group">
-          <label>Fecha y Hora (Ej: 16/02/2026 01:52:05 PM)</label
-          ><input type="text" id="inFecH" value="" readonly oninput="up()" />
+          <label>Fecha y Hora (Ej: 16/02/2026 13:52:05)</label
+          ><input type="text" id="inFecH" value="" oninput="up()" />
         </div>
         <div class="form-group" style="display: none">
           <label>Fecha y Hora</label
@@ -1530,17 +1530,42 @@
       }
 
       function autocompletarFechas_hora() {
+        // ═══ Formato 12h (original) ═══
+        // const opciones = {
+        //     timeZone: 'America/Mexico_City',
+        //     year: 'numeric', month: '2-digit', day: '2-digit',
+        //     hour: '2-digit', minute: '2-digit', second: '2-digit',
+        //     hour12: true
+        // };
+        // const formateador = new Intl.DateTimeFormat('es-MX', opciones);
+        // const partes = formateador.formatToParts(new Date());
+        // let dia = "", mes = "", anio = "", hora = "", mins = "", secs = "", ampm = "";
+        // for (let p of partes) {
+        //     if (p.type === 'day') dia = p.value;
+        //     if (p.type === 'month') mes = p.value;
+        //     if (p.type === 'year') anio = p.value;
+        //     if (p.type === 'hour') hora = p.value;
+        //     if (p.type === 'minute') mins = p.value;
+        //     if (p.type === 'second') secs = p.value;
+        //     if (p.type === 'dayPeriod') ampm = p.value;
+        // }
+        // ampm = ampm.toUpperCase();
+        // const fechaHora = `${dia}/${mes}/${anio} ${hora}:${mins}:${secs} ${ampm}`;
+        // const inFecH = document.getElementById("inFecH");
+        // if (inFecH) inFecH.value = fechaHora;
+
+        // ═══ Formato 24h (actual) ═══
         const opciones = {
             timeZone: 'America/Mexico_City',
             year: 'numeric', month: '2-digit', day: '2-digit',
             hour: '2-digit', minute: '2-digit', second: '2-digit',
-            hour12: true
+            hour12: false
         };
         
         const formateador = new Intl.DateTimeFormat('es-MX', opciones);
         const partes = formateador.formatToParts(new Date());
         
-        let dia = "", mes = "", anio = "", hora = "", mins = "", secs = "", ampm = "";
+        let dia = "", mes = "", anio = "", hora = "", mins = "", secs = "";
         
         for (let p of partes) {
             if (p.type === 'day') dia = p.value;
@@ -1549,12 +1574,9 @@
             if (p.type === 'hour') hora = p.value;
             if (p.type === 'minute') mins = p.value;
             if (p.type === 'second') secs = p.value;
-            if (p.type === 'dayPeriod') ampm = p.value;
         }
         
-        ampm = ampm.toUpperCase();
-        
-        const fechaHora = `${dia}/${mes}/${anio} ${hora}:${mins}:${secs} ${ampm}`;
+        const fechaHora = `${dia}/${mes}/${anio} ${hora}:${mins}:${secs}`;
         
         const inFecH = document.getElementById("inFecH");
         if (inFecH) inFecH.value = fechaHora;
@@ -1621,13 +1643,13 @@
       }
 
       function generatePDF() {
-        autocompletarFechas_hora();
+        if (!document.getElementById("inFecH").value) autocompletarFechas_hora();
         autocompletarFechaSuperior();
         setTimeout(() => window.print(), 50);
       }
 
       window.addEventListener("beforeprint", function () {
-        autocompletarFechas_hora();
+        if (!document.getElementById("inFecH").value) autocompletarFechas_hora();
         autocompletarFechaSuperior();
       });
 

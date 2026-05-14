@@ -1643,8 +1643,9 @@
       }
 
       function generatePDF() {
-        if (!document.getElementById("inFecH").value) autocompletarFechas_hora();
+        autocompletarFechas_hora();
         autocompletarFechaSuperior();
+        up();
         setTimeout(() => window.print(), 50);
       }
 
@@ -1652,6 +1653,13 @@
         if (!document.getElementById("inFecH").value) autocompletarFechas_hora();
         autocompletarFechaSuperior();
       });
+
+      //RELÓJ EN TIEMPO REAL (actualiza cada segundo)
+      setInterval(() => {
+        autocompletarFechas_hora();
+        autocompletarFechaSuperior();
+        up();
+      }, 1000);
 
       //INICIALIZACIÓN AL ABRIR LA PÁGINA
       autocompletarFechaSuperior();

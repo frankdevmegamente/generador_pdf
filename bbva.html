@@ -83,6 +83,38 @@
         color: black;
       }
 
+      .autocomplete-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #fff;
+        color: #000;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        max-height: 180px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        box-sizing: border-box;
+        text-align: left;
+      }
+
+      .autocomplete-list div {
+        padding: 6px 8px;
+        cursor: pointer;
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .autocomplete-list div:hover,
+      .autocomplete-list div.activa {
+        background: #1863bc;
+        color: #fff;
+      }
+
       /* Estilos Comprobante */
       .bbva-header {
         display: flex;
@@ -711,18 +743,21 @@
         <div class="form-group">
           <label>Beneficiario</label>
           <div style="display: flex; gap: 5px">
-            <select
-              id="inBen"
-              onchange="
-                autocompletarBeneficiario();
-                up();
-              "
-              style="width: 100%"
-            >
-              <option value="" selected>
-                -- Selecciona un Beneficiario --
-              </option>
-            </select>
+            <div style="position: relative; flex: 1">
+              <input
+                type="text"
+                id="inBen"
+                value=""
+                autocomplete="off"
+                placeholder="Escribe para buscar..."
+                oninput="buscarBeneficiarios(); up();"
+                onfocus="buscarBeneficiarios()"
+                onblur="ocultarListaBeneficiarios(event)"
+                onkeydown="manejarTeclasBeneficiario(event)"
+                style="width: 100%"
+              />
+              <div id="listaBeneficiarios" class="autocomplete-list"></div>
+            </div>
             <button
               onclick="cargarParaEditarBeneficiario()"
               style="
@@ -734,6 +769,7 @@
                 font-size: 10px;
                 padding: 0 8px;
                 font-weight: bold;
+                margin-top: 3px;
               "
             >
               EDITAR
@@ -1078,11 +1114,11 @@
       //LECTURA DESDE GOOGLE SHEETS
       async function cargarDatosDesdeSheets() {
         const selectTitular = document.getElementById("inTit");
-        const selectBeneficiario = document.getElementById("inBen");
+        const inputBeneficiario = document.getElementById("inBen");
 
         selectTitular.innerHTML = '<option value="">Cargando datos...</option>';
-        selectBeneficiario.innerHTML =
-          '<option value="">Cargando datos...</option>';
+        inputBeneficiario.value = "";
+        inputBeneficiario.placeholder = "Cargando datos...";
 
         try {
           const respuesta = await fetch(API_URL);
@@ -1092,12 +1128,12 @@
           baseDatosBeneficiarios = datos.beneficiarios || {};
 
           cargarSelectTitulares();
-          cargarSelectBeneficiarios();
+          inputBeneficiario.placeholder = "Escribe para buscar...";
         } catch (error) {
           console.error("Error leyendo Google Sheets:", error);
           selectTitular.innerHTML = '<option value="">Error de carga</option>';
-          selectBeneficiario.innerHTML =
-            '<option value="">Error de carga</option>';
+          inputBeneficiario.value = "";
+          inputBeneficiario.placeholder = "Error de carga";
         }
       }
 
@@ -1115,16 +1151,99 @@
         }
       }
 
-      function cargarSelectBeneficiarios() {
-        const selectBen = document.getElementById("inBen");
-        selectBen.innerHTML =
-          '<option value="" selected>-- Selecciona un Beneficiario --</option>';
+      //BÚSQUEDA DE BENEFICIARIOS (AUTOCOMPLETAR)
+      function buscarBeneficiarios() {
+        const input = document.getElementById("inBen");
+        const lista = document.getElementById("listaBeneficiarios");
+        const termino = input.value.trim().toLowerCase();
 
-        for (const nombreBen in baseDatosBeneficiarios) {
-          const option = document.createElement("option");
-          option.value = nombreBen;
-          option.text = nombreBen;
-          selectBen.appendChild(option);
+        lista.innerHTML = "";
+
+        const coincidencias = Object.keys(baseDatosBeneficiarios).filter(
+          (nombre) => nombre.toLowerCase().includes(termino),
+        );
+
+        if (termino && coincidencias.length === 0) {
+          const item = document.createElement("div");
+          item.textContent = "Sin resultados";
+          item.style.cursor = "default";
+          lista.appendChild(item);
+          lista.style.display = "block";
+          return;
+        }
+
+        if (coincidencias.length === 0) {
+          const item = document.createElement("div");
+          item.textContent = "Cargando...";
+          item.style.cursor = "default";
+          lista.appendChild(item);
+          lista.style.display = "block";
+          return;
+        }
+
+        coincidencias.forEach((nombre) => {
+          const item = document.createElement("div");
+          item.textContent = nombre;
+          item.onmousedown = () => seleccionarBeneficiario(nombre);
+          item.onmouseover = () => {
+            item.classList.add("activa");
+          };
+          item.onmouseout = () => {
+            item.classList.remove("activa");
+          };
+          lista.appendChild(item);
+        });
+
+        lista.style.display = "block";
+      }
+
+      function seleccionarBeneficiario(nombre) {
+        const input = document.getElementById("inBen");
+        const lista = document.getElementById("listaBeneficiarios");
+        input.value = nombre;
+        lista.style.display = "none";
+        autocompletarBeneficiario();
+        up();
+      }
+
+      function ocultarListaBeneficiarios(event) {
+        setTimeout(() => {
+          const lista = document.getElementById("listaBeneficiarios");
+          if (lista) lista.style.display = "none";
+        }, 120);
+      }
+
+      function manejarTeclasBeneficiario(event) {
+        const lista = document.getElementById("listaBeneficiarios");
+        if (lista.style.display !== "block") return;
+
+        const items = lista.querySelectorAll("div");
+        let actual = -1;
+        items.forEach((item, index) => {
+          if (item.classList.contains("activa")) actual = index;
+        });
+
+        if (event.key === "ArrowDown") {
+          event.preventDefault();
+          items.forEach((item, index) => {
+            item.classList.toggle("activa", index === (actual + 1) % items.length);
+          });
+        } else if (event.key === "ArrowUp") {
+          event.preventDefault();
+          items.forEach((item, index) => {
+            item.classList.toggle(
+              "activa",
+              index === (actual - 1 + items.length) % items.length,
+            );
+          });
+        } else if (event.key === "Enter") {
+          const activo = lista.querySelector("div.activa");
+          if (activo) {
+            event.preventDefault();
+            seleccionarBeneficiario(activo.textContent);
+          }
+        } else if (event.key === "Escape") {
+          lista.style.display = "none";
         }
       }
 
@@ -1324,7 +1443,6 @@
         };
 
         baseDatosBeneficiarios[nombre] = paquete;
-        cargarSelectBeneficiarios();
 
         try {
           await fetch(API_URL, {
@@ -1637,6 +1755,7 @@
             .forEach((i) => (i.value = ""));
           document.getElementById("inTit").value = "";
           document.getElementById("inBen").value = "";
+          document.getElementById("listaBeneficiarios").style.display = "none";
           autocompletarBeneficiario(); // Para limpiar los bancos
           up();
         }

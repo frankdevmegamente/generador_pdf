@@ -2,7 +2,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>Generador Banregio - Separado</title>
+    <title>Generador Banregio EUR - Separado</title>
     <style>
       /* ================= BASE ================= */
       body {
@@ -356,7 +356,7 @@
           align-items: center;
         "
       >
-        <h3 style="color: #ff6600">BANREGIO EDITOR</h3>
+        <h3 style="color: #ff6600">BANREGIO EUR EDITOR</h3>
         <a
           href="index.html"
           style="color: #ff6600; text-decoration: none; font-size: 11px"
@@ -364,13 +364,13 @@
         >
       </div>
       <a
-        href="banregio_eur.html"
+        href="banregio.html"
         style="
           display: block;
           width: 100%;
           margin-bottom: 10px;
           padding: 8px;
-          background: #003366;
+          background: #ff6600;
           color: white;
           border: none;
           cursor: pointer;
@@ -381,7 +381,7 @@
           box-sizing: border-box;
         "
       >
-        € IR A VERSIÓN EUROS
+        $ IR A VERSIÓN DÓLARES (USD)
       </a>
       <button
         onclick="generatePDF()"
@@ -581,7 +581,7 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Monto USD (Destino)</label
+            <label>Monto EUR (Destino)</label
             ><input
               type="text"
               id="inMonUSD"
@@ -594,7 +594,7 @@
           </div>
           <div class="form-group">
             <label>Tipo de Cambio</label
-            ><input type="text" id="inTC" value="17.2900" oninput="up()" />
+            ><input type="text" id="inTC" value="18.5000" oninput="up()" />
           </div>
         </div>
         <div class="form-group">
@@ -730,7 +730,7 @@
       <table class="data-table">
         <tr>
           <td class="label-cell">Divisa:</td>
-          <td>USD</td>
+          <td>EUR</td>
         </tr>
         <tr>
           <td class="label-cell">Moneda de Liquidación:</td>
@@ -758,11 +758,11 @@
         </tr>
         <tr>
           <td class="label-cell">Monto Operado:</td>
-          <td><span id="outMonUSD">0.00</span> USD</td>
+          <td><span id="outMonUSD">0.00</span> EUR</td>
           <td class="label-cell2">Tipo de Cambio:</td>
           <td><span id="outTC">0.0000</span></td>
           <td class="label-cell2">Comisión:</td>
-          <td>0.00 USD</td>
+          <td>0.00 EUR</td>
         </tr>
         <tr>
           <td class="label-cell">Beneficiario:</td>
@@ -789,7 +789,7 @@
           <td class="label-cell3" style="padding-top: 8px">
             <i>TOTAL:</i> <span id="outTotalUSD"><i>0.00</i></span>
           </td>
-          <td style="padding-top: 8px; font-weight: bold"><i>USD</i></td>
+          <td style="padding-top: 8px; font-weight: bold"><i>EUR</i></td>
         </tr>
       </table>
 

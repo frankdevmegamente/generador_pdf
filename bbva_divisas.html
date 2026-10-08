@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Generador BBVA - Compra y Venta de Divisas</title>
+<style>
+body{font-family:"Helvetica",Arial,sans-serif;background:#e0e0e0;margin:0;display:flex}
+#sidebar{width:420px;background:#072146;color:#fff;padding:20px;height:100vh;overflow-y:auto;position:fixed;box-sizing:border-box;z-index:100}
+#preview{margin-left:440px;margin-right:380px;padding:0;background:#fff;width:780px;min-height:1050px;box-sizing:border-box;position:relative}
+.sheet{width:100%;padding:45px 55px;box-sizing:border-box;color:#000}
+.form-section{margin-bottom:15px;border-bottom:1px solid #1863bc;padding-bottom:10px}
+h3{font-size:13px;color:#1863bc;text-transform:uppercase;margin:10px 0}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.form-group{margin-bottom:8px}
+label{display:block;font-size:10px;color:#adb5bd}
+input,select{width:100%;padding:5px;margin-top:3px;border-radius:2px;border:1px solid #ccc;box-sizing:border-box;font-size:11px;background:#fff;color:#000}
+/* Preview estilo muestra */
+.d-top{font-size:11px;color:#000;margin-bottom:30px}
+.d-logo img{width:120px;display:block}
+.d-sup{font-size:12px;color:#000;margin-top:4px}
+.d-comp{text-align:right;font-size:13px;font-weight:bold;color:#222}
+.d-sub{color:#00a0df;font-size:15px;margin:14px 0 8px 0}
+.d-tit{color:#094fa4;font-size:14px;border-bottom:1px solid #dadada;padding-bottom:4px}
+.d-fecha{font-size:12px;margin-top:4px;border-bottom:1px solid #dadada;padding-bottom:4px}
+.d-sec{color:#094fa4;font-size:14px;margin:16px 0 4px 0}
+.d-row{display:flex;border-bottom:1px solid #dadada;padding:5px 0;font-size:13px}
+.d-lab{width:45%;text-align:right;color:#555;padding-right:20px;box-sizing:border-box}
+.d-val{width:55%;color:#111}
+.d-val.blue{color:#094fa4}
+.d-legal{font-size:12px;font-weight:bold;color:#666;text-align:center;margin-top:22px}
+.btn-wrapper{display:flex;justify-content:space-around;max-width:420px;margin:18px auto}
+.bbva-btn{background:#fff;border:1px solid #1a5296;border-radius:4px;padding:5px 22px;color:#999;font-size:12px;cursor:pointer}
+.url-footer-global{position:absolute;bottom:10px;left:0;right:0;padding:0 20px;display:flex;justify-content:space-between;font-size:8.8px;color:#8a8a8a}
+.url-left{max-width:88%;word-break:break-all}
+#right-panel{width:380px;background:#f4f6f9;border-left:2px solid #d1d5db;padding:20px;height:100vh;overflow-y:auto;position:fixed;right:0;top:0;box-sizing:border-box;z-index:100}
+.panel-card{background:#fff;padding:15px;border-radius:8px;border:1px solid #e5e7eb;margin-bottom:20px}
+.panel-card h3{margin-top:0;border-bottom:1px solid #e5e7eb;padding-bottom:8px}
+.btn-guardar{background:#28a745;color:#fff;border:none;padding:8px 15px;border-radius:4px;cursor:pointer;font-weight:bold;width:100%}
+@media print{@page{size:A4;margin:0}#sidebar,#right-panel{display:none!important}#preview{margin:0!important;width:100%!important;min-height:297mm!important}.url-footer-global{position:fixed!important;bottom:15px!important;width:100%!important;box-sizing:border-box!important}body{background:#fff}}
+</style>
+</head>
+<body>
+<div id="sidebar">
+<div style="display:flex;justify-content:space-between;align-items:center"><h3>BBVA DIVISAS</h3><a href="index.html" style="color:#00aaff;text-decoration:none;font-size:11px">← VOLVER</a></div>
+<button onclick="generatePDF()" style="width:100%;padding:10px;background:#00aaff;color:#fff;border:none;cursor:pointer;font-weight:bold">GENERAR PDF</button>
+<button onclick="limpiar()" style="width:100%;margin-top:5px;padding:5px;background:#444;color:#fff;border:none;cursor:pointer;font-size:10px">LIMPIAR DATOS</button>
+<button onclick="generarDatosRandom();up();" style="width:100%;margin-top:5px;padding:5px;background:#ff9900;color:#fff;border:none;cursor:pointer;font-size:10px;font-weight:bold">GENERAR FOLIOS RANDOM</button>
+<div class="form-section"><h3>Encabezado y Titular</h3>
+<div class="form-group"><label>Titular (reutiliza Sheets)</label><div style="display:flex;gap:5px"><select id="inTit" onchange="autocompletarTitular();up();" style="width:100%"><option value="" selected>-- Selecciona un Titular --</option></select><button onclick="cargarParaEditarTitular()" style="background:#ff9900;color:#fff;border:none;border-radius:2px;cursor:pointer;font-size:10px;padding:0 8px;font-weight:bold">EDITAR</button></div></div>
+<div class="form-row"><div class="form-group"><label>Fecha sup (06/10/2026-13:57:22 PM)</label><input id="inFecSup" oninput="up()" /></div><div class="form-group"><label>Fecha titular (06/10/2026)</label><input id="inFecTit" oninput="up()" /></div></div>
+<div class="form-group"><label>Tipo operación</label><select id="inTipoOp" onchange="up()"><option value="COMPRA" selected>COMPRA</option><option value="VENTA">VENTA</option></select></div>
+</div>
+<div class="form-section"><h3>Cuenta Retiro / Depósito</h3>
+<div class="form-row"><div class="form-group"><label>Cuenta Retiro</label><input id="inCtaR" oninput="up()" /></div><div class="form-group"><label>Cuenta Depósito</label><input id="inCtaD" oninput="up()" /></div></div>
+<div class="form-row"><div class="form-group"><label>Moneda Retiro</label><select id="inMonR" onchange="up()"><option>PESOS</option><option>DOLARES</option></select></div><div class="form-group"><label>Moneda Depósito</label><select id="inMonD" onchange="up()"><option>DOLARES</option><option>PESOS</option></select></div></div>
+<div class="form-row"><div class="form-group"><label>Importe Retiro</label><input id="inImpR" value="543,000.00" oninput="formatCurrencyInput(this);calcTC();up()" /></div><div class="form-group"><label>Importe Depósito</label><input id="inImpD" value="30,000.00" oninput="formatCurrencyInput(this);calcTC();up()" /></div></div>
+</div>
+<div class="form-section"><h3>Operación</h3>
+<div class="form-row"><div class="form-group"><label>Tipo de cambio (18.10000)</label><input id="inTC" value="18.10000" oninput="up()" /></div><div class="form-group"><label>Fecha operación (06-10-2026)</label><input id="inFecOp" oninput="up()" /></div></div>
+<div class="form-row"><div class="form-group"><label>Hora operación (13:57:22)</label><input id="inHoraOp" oninput="up()" /></div><div class="form-group"><label>Folio operación</label><input id="inFolO" value="7340332058" oninput="up()" /></div></div>
+<div class="form-group"><label>Folio operación cambiaria</label><input id="inFolC" value="64136338" oninput="up()" /></div>
+</div>
+</div>
+<div id="preview"><div class="sheet">
+<div class="d-top outFecTop">06/10/26, 13:57</div>
+<div class="d-logo"><img src="BBVA_logo.svg.png" alt="BBVA" /><div class="d-sup" id="outFecSup">06/10/2026-13:57:22 PM</div></div>
+<div class="d-comp">COMPROBANTE</div>
+<div class="d-sub">Compra y Venta de divisas - <span id="outTipoOpTitulo">Compra</span></div>
+<div class="d-tit" id="outTit">LOGISTICA EMPRESARIAL VERMONT</div>
+<div class="d-fecha" id="outFecTit">06/10/2026</div>
+<div class="d-sec">Datos de la cuenta de retiro</div>
+<div class="d-row"><div class="d-lab">Número de cuenta:</div><div class="d-val" id="outCtaR">0124915194</div></div>
+<div class="d-row"><div class="d-lab">Moneda:</div><div class="d-val" id="outMonR">PESOS</div></div>
+<div class="d-row"><div class="d-lab">Importe:</div><div class="d-val blue" id="outImpR">543,000.00</div></div>
+<div class="d-sec">Datos de la cuenta de depósito</div>
+<div class="d-row"><div class="d-lab">Número de cuenta:</div><div class="d-val" id="outCtaD">0126511570</div></div>
+<div class="d-row"><div class="d-lab">Moneda:</div><div class="d-val" id="outMonD">DOLARES</div></div>
+<div class="d-row"><div class="d-lab">Importe:</div><div class="d-val blue" id="outImpD">30,000.00</div></div>
+<div class="d-sec">Información de la operación</div>
+<div class="d-row"><div class="d-lab">Tipo de cambio aplicado:</div><div class="d-val" id="outTC">18.10000</div></div>
+<div class="d-row"><div class="d-lab">Tipo de operación:</div><div class="d-val" id="outTipoOp">COMPRA</div></div>
+<div class="d-row"><div class="d-lab">Fecha de operación:</div><div class="d-val" id="outFecOp">06-10-2026</div></div>
+<div class="d-row"><div class="d-lab">Hora de operación:</div><div class="d-val" id="outHoraOp">13:57:22</div></div>
+<div class="d-row"><div class="d-lab">Folio de operación:</div><div class="d-val" id="outFolO">7340332058</div></div>
+<div class="d-row"><div class="d-lab">Folio de operación cambiaria:</div><div class="d-val" id="outFolC">64136338</div></div>
+<div class="d-legal">BBVA MÉXICO S.A., INSTITUCIÓN DE BANCA MÚLTIPLE, GRUPO FINANCIERO BBVA MÉXICO</div>
+<div class="btn-wrapper"><button class="bbva-btn" onclick="window.close()">Cerrar</button><button class="bbva-btn" onclick="window.print()">Imprimir</button></div>
+</div>
+<div class="url-footer-global"><span class="url-left">https://empresas.bbvanet.com.mx/mexiconet2/mexiconet2/OperacionCBTFServlet?proceso=compra_venta_divisas_pr&amp;operacion=compra_venta_divi…</span><span>1/1</span></div>
+</div>
+<div id="right-panel"><div class="panel-card"><h3>+ Agregar Nuevo Titular</h3>
+<div class="form-group"><label>Nombre del Titular:</label><input id="modNomTit" placeholder="Ej. EMPRESA SA DE CV" /></div>
+<div class="form-group"><label>Cuenta de Retiro:</label><input id="modCtaTit" placeholder="Ej. 0124915194" /></div>
+<button class="btn-guardar" id="btnGuardarModal" onclick="guardarTitularPanel()">Guardar Titular</button></div></div>
+<script>
+const API_URL="https://script.google.com/macros/s/AKfycbydqyZ8opyE9-NXuSJvHv2cBzruNLtAN4g4UtXCKBDRZgf1SKgz71XUAjDmP2qIxSeP/exec";
+let baseDatosTitulares={};
+async function cargarDatosDesdeSheets(){const s=document.getElementById("inTit");s.innerHTML='<option value="">Cargando datos...</option>';try{const r=await fetch(API_URL);const d=await r.json();baseDatosTitulares=d.titulares||{};cargarSelectTitulares();}catch(e){s.innerHTML='<option value="">Error de carga</option>';}}
+function cargarSelectTitulares(){const s=document.getElementById("inTit");s.innerHTML='<option value="" selected>-- Selecciona un Titular --</option>';for(const n in baseDatosTitulares){const o=document.createElement("option");o.value=n;o.text=n;s.appendChild(o);}}
+function autocompletarTitular(){const d=baseDatosTitulares[document.getElementById("inTit").value];document.getElementById("inCtaR").value=d?(d.cuentaRetiro||""):"";}
+function cargarParaEditarTitular(){const n=document.getElementById("inTit").value;if(!n){alert("Selecciona un titular primero.");return;}document.getElementById("modNomTit").value=n;document.getElementById("modCtaTit").value=(baseDatosTitulares[n]||{}).cuentaRetiro||"";}
+async function guardarTitularPanel(){const n=document.getElementById("modNomTit").value.trim().toUpperCase();const c=document.getElementById("modCtaTit").value.trim();if(!n||!c){alert("Llena ambos campos.");return;}const b=document.getElementById("btnGuardarModal");b.innerText="Guardando...";b.disabled=true;baseDatosTitulares[n]={cuentaRetiro:c};cargarSelectTitulares();try{await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({tipo:"titular",nombre:n,cuentaRetiro:c})});document.getElementById("modNomTit").value="";document.getElementById("modCtaTit").value="";alert("¡Titular guardado!");}catch(e){alert("Guardado local, error de red.");}b.innerText="Guardar Titular";b.disabled=false;}
+function generarDatosRandom(){document.getElementById("inFolO").value=Math.floor(1000000000+Math.random()*9000000000);document.getElementById("inFolC").value=Math.floor(10000000+Math.random()*90000000);}
+function formatCurrencyInput(i){let v=i.value.replace(/\D/g,"");if(!v){i.value="";return;}let n=(parseInt(v)/100).toFixed(2);let p=n.split(".");p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,",");i.value=p.join(".");}
+function parseNum(s){return parseFloat(String(s).replace(/,/g,""))||0;}
+function calcTC(){const r=parseNum(document.getElementById("inImpR").value);const d=parseNum(document.getElementById("inImpD").value);if(d>0){document.getElementById("inTC").value=(r/d).toFixed(5);}}
+function cap(s){return s.charAt(0)+s.slice(1).toLowerCase();}
+function up(){const m={inTit:"outTit",inFecSup:"outFecSup",inFecTit:"outFecTit",inCtaR:"outCtaR",inMonR:"outMonR",inImpR:"outImpR",inCtaD:"outCtaD",inMonD:"outMonD",inImpD:"outImpD",inTC:"outTC",inTipoOp:"outTipoOp",inFecOp:"outFecOp",inHoraOp:"outHoraOp",inFolO:"outFolO",inFolC:"outFolC"};for(const k in m){const el=document.getElementById(k);if(el)document.getElementById(m[k]).innerText=el.value;}document.getElementById("outTipoOpTitulo").innerText=cap(document.getElementById("inTipoOp").value||"COMPRA");}
+function fechasInit(){try{const f=new Intl.DateTimeFormat('es-MX',{timeZone:'America/Mexico_City',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});const p={};f.formatToParts(new Date()).forEach(x=>p[x.type]=x.value);document.getElementById("inFecSup").value=`${p.day}/${p.month}/${p.year}-${p.hour}:${p.minute}:${p.second} PM`;document.getElementById("inFecTit").value=`${p.day}/${p.month}/${p.year}`;document.getElementById("inFecOp").value=`${p.day}-${p.month}-${p.year}`;document.getElementById("inHoraOp").value=`${p.hour}:${p.minute}:${p.second}`;}catch(e){}}
+function limpiar(){if(confirm("¿Limpiar todo?")){document.querySelectorAll("#sidebar input").forEach(i=>i.value="");document.getElementById("inTit").value="";up();}}
+function generatePDF(){up();setTimeout(()=>window.print(),50);}
+cargarDatosDesdeSheets();fechasInit();up();
+</script>
+</body>
+</html>

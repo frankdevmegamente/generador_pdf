@@ -572,7 +572,11 @@
         <div class="form-row">
           <div class="form-group">
             <label>Fecha Operación</label
-            ><input type="text" id="inFecOp" value="" readonly oninput="up()" />
+            ><input type="text" id="inFecOp" value="" oninput="up()" />
+          </div>
+          <div class="form-group">
+            <label>Hora Operación (13:57:22)</label
+            ><input type="text" id="inHoraOp" value="" oninput="up()" />
           </div>
           <div class="form-group">
             <label>Confirmación No.</label
@@ -1370,8 +1374,9 @@ function normalizarABA(v) {
         document
           .querySelectorAll(".outFecOp2")
           .forEach((el) => (el.innerText = f));
+        const hora = document.getElementById("inHoraOp");
         const footerEl = document.getElementById("footerTime");
-        if (footerEl) footerEl.innerText = f || "--/--/----";
+        if (footerEl) footerEl.innerText = f && hora && hora.value ? `${f} ${hora.value}` : f || "--/--/----";
       }
 
       function limpiar() {
@@ -1390,29 +1395,9 @@ function normalizarABA(v) {
       function updateFooterClock() {
         const footerEl = document.getElementById("footerTime");
         if (!footerEl) return;
-        const opciones = {
-          timeZone: 'America/Mexico_City',
-          year: 'numeric', month: '2-digit', day: '2-digit',
-          hour: '2-digit', minute: '2-digit', second: '2-digit',
-          hour12: false
-        };
-        const formateador = new Intl.DateTimeFormat('es-MX', opciones);
-        const partes = formateador.formatToParts(new Date());
-        let dia = "", mes = "", anio = "", hora = "", mins = "", secs = "";
-        for (let p of partes) {
-          if (p.type === 'day') dia = p.value;
-          if (p.type === 'month') mes = p.value;
-          if (p.type === 'year') anio = p.value;
-          if (p.type === 'hour') hora = p.value;
-          if (p.type === 'minute') mins = p.value;
-          if (p.type === 'second') secs = p.value;
-        }
-        const inFec = document.getElementById("inFecOp").value;
-        const datePart =
-          inFec && inFec.trim()
-            ? inFec.trim()
-            : `${dia}/${mes}/${anio}`;
-        footerEl.innerText = `${datePart} ${hora}:${mins}:${secs}`;
+        const f = document.getElementById("inFecOp").value;
+        const h = document.getElementById("inHoraOp");
+        footerEl.innerText = f && h && h.value ? `${f} ${h.value}` : f || "--/--/----";
       }
       function autocompletarFechas() {
         const opciones = {
@@ -1429,7 +1414,11 @@ function normalizarABA(v) {
         }
         const fechaActual = `${dia}/${mes}/${anio}`;
         const inFecOp = document.getElementById("inFecOp");
-        if (inFecOp) inFecOp.value = fechaActual;
+        if (inFecOp && !inFecOp.value) inFecOp.value = fechaActual;
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        const inHoraOp = document.getElementById("inHoraOp");
+        if (inHoraOp && !inHoraOp.value) inHoraOp.value = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
       }
       function handleBeforePrint() {
         updateFooterClock();

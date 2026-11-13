@@ -352,7 +352,7 @@
             <div class="form-group"><label>Titular Principal</label><input type="text" id="inTit"
                     value="COMERCIALIZADORA BELOCIO SA DE CV" oninput="up()"></div>
             <div class="form-group"><label>Fecha y Hora (Ej: 16/02/2026 13:52:05 PM)</label><input type="text"
-                    id="inFec" value="" readonly oninput="up()"></div>
+                    id="inFec" value="" oninput="up()"></div>
         </div>
 
         <div class="form-section">
@@ -591,7 +591,7 @@
             const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
             const fechaHora = `${fecha} ${hora}:${mins}:${secs} ${ampm}`;
             const inFec = document.getElementById('inFec');
-            if (inFec) {
+            if (inFec && !inFec.value) {
                 inFec.value = fechaHora;
             }
         }

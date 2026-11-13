@@ -450,11 +450,11 @@
         </div>
         <div class="form-group">
           <label>Fecha y Hora (Ej: 16/02/2026 13:52:05 PM)</label
-          ><input type="text" id="inFecH" value="" readonly oninput="up()" />
+          ><input type="text" id="inFecH" value="" oninput="syncFechasBBVA2('h'); up()" />
         </div>
         <div class="form-group" style="display: none">
           <label>Fecha y Hora</label
-          ><input type="text" id="inFec" value="" readonly oninput="up()" />
+          ><input type="text" id="inFec" value="" oninput="syncFechasBBVA2('f'); up()" />
         </div>
       </div>
 
@@ -1322,6 +1322,32 @@
           document.getElementById("inTit").value;
       }
 
+      function syncFechasBBVA2(origen) {
+        const inFecH = document.getElementById("inFecH");
+        const inFec = document.getElementById("inFec");
+        const pad = (n) => String(n).padStart(2, "0");
+        if (origen === "h") {
+          const m = (inFecH.value || "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+          if (m) {
+            const dd = pad(m[1]);
+            const mm = pad(m[2]);
+            const yyyy = m[3];
+            if (inFec) inFec.value = `${dd}/${mm}/${yyyy}`;
+          }
+        } else if (origen === "f") {
+          const m = (inFec.value || "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+          if (m && inFecH) {
+            const dd = pad(m[1]);
+            const mm = pad(m[2]);
+            const yyyy = m[3];
+            const tmatch = (inFecH.value || "").match(/\s+(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+            const hh = tmatch ? pad(tmatch[1]) : "00";
+            const mi = tmatch ? tmatch[2] : "00";
+            const ss = tmatch && tmatch[3] ? tmatch[3] : "00";
+            inFecH.value = `${dd}/${mm}/${yyyy} ${hh}:${mi}:${ss}`;
+          }
+        }
+      }
       function autocompletarFechas_hora() {
         const pad = (n) => n.toString().padStart(2, "0");
         const now = new Date();
@@ -1332,7 +1358,7 @@
         const ampm = now.getHours() >= 12 ? "PM" : "AM";
         const fechaHora = `${fecha} ${hora}:${mins}:${secs} ${ampm}`;
         const inFecH = document.getElementById("inFecH");
-        if (inFecH) inFecH.value = fechaHora;
+        if (inFecH && !inFecH.value) inFecH.value = fechaHora;
       }
 
       function autocompletarFechas() {
@@ -1340,7 +1366,7 @@
         const now = new Date();
         const fecha = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
         const inFec = document.getElementById("inFec");
-        if (inFec) inFec.value = fecha;
+        if (inFec && !inFec.value) inFec.value = fecha;
       }
 
       function limpiar() {

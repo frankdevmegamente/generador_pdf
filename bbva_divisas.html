@@ -47,22 +47,23 @@ input,select{width:100%;padding:5px;margin-top:3px;border-radius:2px;border:1px 
 <button onclick="generarDatosRandom();up();" style="width:100%;margin-top:5px;padding:5px;background:#ff9900;color:#fff;border:none;cursor:pointer;font-size:10px;font-weight:bold">GENERAR FOLIOS RANDOM</button>
 <div class="form-section"><h3>Encabezado y Titular</h3>
 <div class="form-group"><label>Titular (reutiliza Sheets)</label><div style="display:flex;gap:5px"><select id="inTit" onchange="autocompletarTitular();up();" style="width:100%"><option value="" selected>-- Selecciona un Titular --</option></select><button onclick="cargarParaEditarTitular()" style="background:#ff9900;color:#fff;border:none;border-radius:2px;cursor:pointer;font-size:10px;padding:0 8px;font-weight:bold">EDITAR</button></div></div>
-<div class="form-row"><div class="form-group"><label>Fecha sup (06/10/2026-13:57:22 PM)</label><input id="inFecSup" oninput="up()" /></div><div class="form-group"><label>Fecha titular (06/10/2026)</label><input id="inFecTit" oninput="up()" /></div></div>
+<div class="form-row"><div class="form-group"><label>Fecha sup (06/10/2026-13:57:22 PM)</label><input id="inFecSup" oninput="syncDivisas('sup'); up()" /></div><div class="form-group"><label>Fecha titular (06/10/2026)</label><input id="inFecTit" oninput="syncDivisas('tit'); up()" /></div></div>
+<div class="form-row"><div class="form-group"><label>Fecha superior barra (06/10/26, 13:57)</label><input id="inFecTop" oninput="syncDivisas('top'); up()" /></div></div>
 <div class="form-group"><label>Tipo operación</label><select id="inTipoOp" onchange="up()"><option value="COMPRA" selected>COMPRA</option><option value="VENTA">VENTA</option></select></div>
 </div>
 <div class="form-section"><h3>Cuenta Retiro / Depósito</h3>
 <div class="form-row"><div class="form-group"><label>Cuenta Retiro</label><input id="inCtaR" oninput="up()" /></div><div class="form-group"><label>Cuenta Depósito</label><input id="inCtaD" oninput="up()" /></div></div>
 <div class="form-row"><div class="form-group"><label>Moneda Retiro</label><select id="inMonR" onchange="up()"><option>PESOS</option><option>DOLARES</option></select></div><div class="form-group"><label>Moneda Depósito</label><select id="inMonD" onchange="up()"><option>DOLARES</option><option>PESOS</option></select></div></div>
-<div class="form-row"><div class="form-group"><label>Importe Retiro</label><input id="inImpR" value="543,000.00" oninput="formatCurrencyInput(this);calcTC();up()" /></div><div class="form-group"><label>Importe Depósito</label><input id="inImpD" value="30,000.00" oninput="formatCurrencyInput(this);calcTC();up()" /></div></div>
+<div class="form-row"><div class="form-group"><label>Importe Retiro</label><input id="inImpR" oninput="formatCurrencyInput(this);calcTC();up()" /></div><div class="form-group"><label>Importe Depósito</label><input id="inImpD" oninput="formatCurrencyInput(this);calcFromDolares();up()" /></div></div>
 </div>
 <div class="form-section"><h3>Operación</h3>
-<div class="form-row"><div class="form-group"><label>Tipo de cambio (18.10000)</label><input id="inTC" value="18.10000" oninput="up()" /></div><div class="form-group"><label>Fecha operación (06-10-2026)</label><input id="inFecOp" oninput="up()" /></div></div>
-<div class="form-row"><div class="form-group"><label>Hora operación (13:57:22)</label><input id="inHoraOp" oninput="up()" /></div><div class="form-group"><label>Folio operación</label><input id="inFolO" value="7340332058" oninput="up()" /></div></div>
+<div class="form-row"><div class="form-group"><label>Tipo de cambio (18.10000)</label><input id="inTC" oninput="calcFromTC();up()" /></div><div class="form-group"><label>Fecha operación (06-10-2026)</label><input id="inFecOp" oninput="syncDivisas('op'); up()" /></div></div>
+<div class="form-row"><div class="form-group"><label>Hora operación (13:57:22)</label><input id="inHoraOp" oninput="syncDivisas('hora'); up()" /></div><div class="form-group"><label>Folio operación</label><input id="inFolO" value="7340332058" oninput="up()" /></div></div>
 <div class="form-group"><label>Folio operación cambiaria</label><input id="inFolC" value="64136338" oninput="up()" /></div>
 </div>
 </div>
 <div id="preview"><div class="sheet">
-<div class="d-top outFecTop">06/10/26, 13:57</div>
+<div class="d-top" id="outFecTop">06/10/26, 13:57</div>
 <div class="d-logo"><img src="BBVA_logo.svg.png" alt="BBVA" /><div class="d-sup" id="outFecSup">06/10/2026-13:57:22 PM</div></div>
 <div class="d-comp">COMPROBANTE</div>
 <div class="d-sub">Compra y Venta de divisas - <span id="outTipoOpTitulo">Compra</span></div>
@@ -104,9 +105,78 @@ function generarDatosRandom(){document.getElementById("inFolO").value=Math.floor
 function formatCurrencyInput(i){let v=i.value.replace(/\D/g,"");if(!v){i.value="";return;}let n=(parseInt(v)/100).toFixed(2);let p=n.split(".");p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,",");i.value=p.join(".");}
 function parseNum(s){return parseFloat(String(s).replace(/,/g,""))||0;}
 function calcTC(){const r=parseNum(document.getElementById("inImpR").value);const d=parseNum(document.getElementById("inImpD").value);if(d>0){document.getElementById("inTC").value=(r/d).toFixed(5);}}
+function calcFromDolares(){const d=parseNum(document.getElementById("inImpD").value);const tc=parseNum(document.getElementById("inTC").value);const r=parseNum(document.getElementById("inImpR").value);if(d>0&&tc>0){document.getElementById("inImpR").value=(d*tc).toFixed(2);formatCurrencyInput(document.getElementById("inImpR"));}else if(d>0&&r>0){document.getElementById("inTC").value=(r/d).toFixed(5);}}
+function calcFromTC(){const d=parseNum(document.getElementById("inImpD").value);const tc=parseNum(document.getElementById("inTC").value);if(d>0&&tc>0){document.getElementById("inImpR").value=(d*tc).toFixed(2);formatCurrencyInput(document.getElementById("inImpR"));}}
 function cap(s){return s.charAt(0)+s.slice(1).toLowerCase();}
-function up(){const m={inTit:"outTit",inFecSup:"outFecSup",inFecTit:"outFecTit",inCtaR:"outCtaR",inMonR:"outMonR",inImpR:"outImpR",inCtaD:"outCtaD",inMonD:"outMonD",inImpD:"outImpD",inTC:"outTC",inTipoOp:"outTipoOp",inFecOp:"outFecOp",inHoraOp:"outHoraOp",inFolO:"outFolO",inFolC:"outFolC"};for(const k in m){const el=document.getElementById(k);if(el)document.getElementById(m[k]).innerText=el.value;}document.getElementById("outTipoOpTitulo").innerText=cap(document.getElementById("inTipoOp").value||"COMPRA");}
-function fechasInit(){try{const f=new Intl.DateTimeFormat('es-MX',{timeZone:'America/Mexico_City',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});const p={};f.formatToParts(new Date()).forEach(x=>p[x.type]=x.value);document.getElementById("inFecSup").value=`${p.day}/${p.month}/${p.year}-${p.hour}:${p.minute}:${p.second} PM`;document.getElementById("inFecTit").value=`${p.day}/${p.month}/${p.year}`;document.getElementById("inFecOp").value=`${p.day}-${p.month}-${p.year}`;document.getElementById("inHoraOp").value=`${p.hour}:${p.minute}:${p.second}`;}catch(e){}}
+function up(){const m={inTit:"outTit",inFecTop:"outFecTop",inFecSup:"outFecSup",inFecTit:"outFecTit",inCtaR:"outCtaR",inMonR:"outMonR",inImpR:"outImpR",inCtaD:"outCtaD",inMonD:"outMonD",inImpD:"outImpD",inTC:"outTC",inTipoOp:"outTipoOp",inFecOp:"outFecOp",inHoraOp:"outHoraOp",inFolO:"outFolO",inFolC:"outFolC"};for(const k in m){const el=document.getElementById(k);if(el)document.getElementById(m[k]).innerText=el.value;}document.getElementById("outTipoOpTitulo").innerText=cap(document.getElementById("inTipoOp").value||"COMPRA");}
+function syncDivisas(origen) {
+  const pad = n => String(n).padStart(2, "0");
+  const sup = document.getElementById("inFecSup");
+  const tit = document.getElementById("inFecTit");
+  const op = document.getElementById("inFecOp");
+  const hora = document.getElementById("inHoraOp");
+  if (origen === "sup") {
+    const m = (sup.value || "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})-(\d{1,2}):(\d{2}):(\d{2})/);
+    if (m) {
+      const dd = pad(m[1]), mm = pad(m[2]), yyyy = m[3];
+      if (tit) tit.value = `${dd}/${mm}/${yyyy}`;
+      if (op) op.value = `${dd}-${mm}-${yyyy}`;
+      if (hora) hora.value = `${pad(m[4])}:${m[5]}:${m[6]}`;
+      const top = document.getElementById("inFecTop");
+      if (top) top.value = `${dd}/${mm}/${yyyy.slice(-2)}, ${pad(m[4])}:${m[5]}`;
+    }
+  } else if (origen === "tit") {
+    const m = (tit.value || "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (m) {
+      const dd = pad(m[1]), mm = pad(m[2]), yyyy = m[3];
+      if (op) op.value = `${dd}-${mm}-${yyyy}`;
+      if (sup) {
+        const t = (sup.value || "").match(/-(\d{1,2}):(\d{2}):(\d{2})/);
+        const time = t ? `-${pad(t[1])}:${t[2]}:${t[3]}` : "-00:00:00";
+        sup.value = `${dd}/${mm}/${yyyy}${time} PM`;
+        const top = document.getElementById("inFecTop");
+        if (top) top.value = `${dd}/${mm}/${yyyy.slice(-2)}, ${t ? pad(t[1]) : "00"}:${t ? t[2] : "00"}`;
+      }
+    }
+  } else if (origen === "op") {
+    const m = (op.value || "").match(/^(\d{1,2})-(\d{1,2})-(\d{4})/);
+    if (m) {
+      const dd = pad(m[1]), mm = pad(m[2]), yyyy = m[3];
+      if (tit) tit.value = `${dd}/${mm}/${yyyy}`;
+      if (sup) {
+        const t = (sup.value || "").match(/-(\d{1,2}):(\d{2}):(\d{2})/);
+        const time = t ? `-${pad(t[1])}:${t[2]}:${t[3]}` : "-00:00:00";
+        sup.value = `${dd}/${mm}/${yyyy}${time} PM`;
+        const top = document.getElementById("inFecTop");
+        if (top) top.value = `${dd}/${mm}/${yyyy.slice(-2)}, ${t ? pad(t[1]) : "00"}:${t ? t[2] : "00"}`;
+      }
+    }
+  } else if (origen === "hora") {
+    const m = (hora.value || "").match(/^(\d{1,2}):(\d{2}):(\d{2})/);
+    if (m && sup) {
+      const d = (sup.value || "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+      if (d) {
+        const dd = pad(d[1]), mm = pad(d[2]), yyyy = d[3];
+        sup.value = `${dd}/${mm}/${yyyy}-${pad(m[1])}:${m[2]}:${m[3]} PM`;
+        const top = document.getElementById("inFecTop");
+        if (top) top.value = `${dd}/${mm}/${String(yyyy).slice(-2)}, ${pad(m[1])}:${m[2]}`;
+      }
+    }
+  } else if (origen === "top") {
+    const m = (document.getElementById("inFecTop").value || "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:,\s*(\d{1,2}):(\d{2}))?/);
+    if (m) {
+      const dd = pad(m[1]), mm = pad(m[2]);
+      const yyyy = m[3].length === 2 ? "20" + m[3] : m[3];
+      const yy = yyyy.slice(-2);
+      const hh = m[4] ? pad(m[4]) : "00";
+      const mi = m[5] ? m[5] : "00";
+      if (tit) tit.value = `${dd}/${mm}/${yyyy}`;
+      if (op) op.value = `${dd}-${mm}-${yyyy}`;
+      if (sup) sup.value = `${dd}/${mm}/${yyyy}-${hh}:${mi}:00 PM`;
+      if (hora) hora.value = `${hh}:${mi}:00`;
+    }
+  }
+}function fechasInit(){try{const f=new Intl.DateTimeFormat('es-MX',{timeZone:'America/Mexico_City',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});const p={};f.formatToParts(new Date()).forEach(x=>p[x.type]=x.value);document.getElementById("inFecSup").value=`${p.day}/${p.month}/${p.year}-${p.hour}:${p.minute}:${p.second} PM`;document.getElementById("inFecTit").value=`${p.day}/${p.month}/${p.year}`;document.getElementById("inFecOp").value=`${p.day}-${p.month}-${p.year}`;document.getElementById("inHoraOp").value=`${p.hour}:${p.minute}:${p.second}`;document.getElementById("inFecTop").value=`${p.day}/${p.month}/${String(p.year).slice(-2)}, ${p.hour}:${p.minute}`;}catch(e){}}
 function limpiar(){if(confirm("¿Limpiar todo?")){document.querySelectorAll("#sidebar input").forEach(i=>i.value="");document.getElementById("inTit").value="";up();}}
 function generatePDF(){up();setTimeout(()=>window.print(),50);}
 cargarDatosDesdeSheets();fechasInit();up();

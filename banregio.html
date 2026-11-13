@@ -553,14 +553,21 @@
           <label>Cuenta</label
           ><input type="text" id="inCtaB" value="" oninput="up()" />
         </div>
-        <div class="form-group">
-          <label>Banco Beneficiario</label>
-          <input type="text" id="inBanA" value="" oninput="up()" />
-        </div>
-        <div class="form-group">
-          <label>ABA</label>
-          <input type="text" id="inABA" value="" oninput="up()" />
-        </div>
+<div class="form-group">
+  <label>Banco Beneficiario</label>
+  <input type="text" id="inBanA" value="" oninput="up()" />
+</div>
+<div class="form-group">
+  <label style="display:flex;align-items:center;gap:8px;font-size:11px;color:#fff;cursor:pointer;margin:0">
+    <input type="checkbox" id="chkRef" onchange="up()" style="accent-color:#ff6600;width:16px;height:16px;cursor:pointer;margin:0" />
+    <span>Incluir Referencia</span>
+  </label>
+  <input type="text" id="inRef" value="" placeholder="Ej. REF-12345" oninput="up()" style="display:none;margin-top:6px" />
+</div>
+<div class="form-group">
+  <label>ABA</label>
+  <input type="text" id="inABA" value="" oninput="up()" />
+</div>
         <div class="form-group">
           <label>Plaza/Ciudad</label>
           <input type="text" id="inPlaza" value="" oninput="up()" />
@@ -776,14 +783,18 @@
           <td class="label-cell">Cuenta:</td>
           <td colspan="3" id="outCtaB">---</td>
         </tr>
-        <tr>
-          <td class="label-cell">Banco Beneficiario:</td>
-          <td colspan="3" id="outBanA">---</td>
-        </tr>
-        <tr>
-          <td class="label-cell">ABA:</td>
-          <td colspan="3" id="outABA">---</td>
-        </tr>
+<tr>
+  <td class="label-cell">Banco Beneficiario:</td>
+  <td colspan="3" id="outBanA">---</td>
+</tr>
+<tr id="rowRef" style="display:none">
+  <td class="label-cell">Referencia:</td>
+  <td colspan="3" id="outRef">---</td>
+</tr>
+<tr>
+  <td class="label-cell">ABA:</td>
+  <td colspan="3" id="outABA">---</td>
+</tr>
         <tr>
           <td class="label-cell">Plaza:</td>
           <td colspan="3" id="outPlaza">---</td>
@@ -1377,6 +1388,14 @@ function normalizarABA(v) {
         const hora = document.getElementById("inHoraOp");
         const footerEl = document.getElementById("footerTime");
         if (footerEl) footerEl.innerText = f && hora && hora.value ? `${f} ${hora.value}` : f || "--/--/----";
+        const chkRef = document.getElementById("chkRef");
+        const inRef = document.getElementById("inRef");
+        const rowRef = document.getElementById("rowRef");
+        const outRef = document.getElementById("outRef");
+        const showRef = !!(chkRef && chkRef.checked);
+        if (inRef) inRef.style.display = showRef ? "" : "none";
+        if (rowRef) rowRef.style.display = showRef ? "" : "none";
+        if (outRef && inRef) outRef.innerText = showRef ? (inRef.value || "---") : "---";
       }
 
       function limpiar() {
@@ -1385,11 +1404,15 @@ function normalizarABA(v) {
             .querySelectorAll("#sidebar input")
             .forEach((i) => (i.value = ""));
           document.getElementById("selectTitular").value = "";
-          document.getElementById("selectBeneficiario").value = "";
-          document.getElementById("listaBeneficiarios").style.display = "none";
-          document.getElementById("listaBeneficiariosSel").style.display =
-            "none";
-          up();
+           document.getElementById("selectBeneficiario").value = "";
+           document.getElementById("listaBeneficiarios").style.display = "none";
+           document.getElementById("listaBeneficiariosSel").style.display =
+             "none";
+           const chkRef = document.getElementById("chkRef");
+           if (chkRef) chkRef.checked = false;
+           const inRef = document.getElementById("inRef");
+           if (inRef) inRef.value = "";
+           up();
         }
       }
       function updateFooterClock() {
